@@ -1,10 +1,9 @@
 package edu.hw01;
 
 public class Task01 {
-    private Task01(){
-    }
+    private Task01(){}
 
-    public static int videoLength(String time){
+    public static int minutesToSeconds(String time){
         String[] numbers = time.split(":");
         int minutes =  Integer.parseInt(numbers[0]),
             seconds = Integer.parseInt(numbers[1]);

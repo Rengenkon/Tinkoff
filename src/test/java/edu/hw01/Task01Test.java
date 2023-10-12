@@ -12,7 +12,7 @@ public class Task01Test {
         String time = "1:30";
 
         // when
-        int secondsLength = Task01.videoLength(time);
+        int secondsLength = Task01.minutesToSeconds(time);
 
         // then
         assertThat(secondsLength)
@@ -26,7 +26,7 @@ public class Task01Test {
         String time = "0:60";
 
         // when
-        int secondsLength = Task01.videoLength(time);
+        int secondsLength = Task01.minutesToSeconds(time);
 
         // then
         assertThat(secondsLength)
@@ -39,7 +39,7 @@ public class Task01Test {
         String time = "2:-3";
 
         // when
-        int secondsLength = Task01.videoLength(time);
+        int secondsLength = Task01.minutesToSeconds(time);
 
         // then
         assertThat(secondsLength)
@@ -52,7 +52,7 @@ public class Task01Test {
         String time = "-5:30";
 
         // when
-        int secondsLength = Task01.videoLength(time);
+        int secondsLength = Task01.minutesToSeconds(time);
 
         // then
         assertThat(secondsLength)
