@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@DisplayName("Особый палиндром")
 public class Task05Test {
     @Test
     @DisplayName("Число меньше 10")

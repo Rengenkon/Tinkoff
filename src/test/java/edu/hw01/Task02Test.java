@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@DisplayName("Количество цифр")
 public class Task02Test {
     @Test
     @DisplayName("Ноль")

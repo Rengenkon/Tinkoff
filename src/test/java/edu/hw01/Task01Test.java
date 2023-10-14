@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@DisplayName("Длина видео")
 public class Task01Test {
     @Test
     @DisplayName("Правильный ввод")

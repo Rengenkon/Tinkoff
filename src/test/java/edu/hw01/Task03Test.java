@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@DisplayName("Вложенный массив")
 public class Task03Test {
     @Test
     @DisplayName("Элемент из промежутка")
