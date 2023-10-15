@@ -1,11 +1,11 @@
 package edu.hw01;
 
 public class Task07 {
-    private  Task07(){}
+    private  Task07() {}
 
-    public static int rotateLeft(int number, int shift){
+    public static int rotateLeft(int number, int sh) {
         int[] digits = binary(number);
-        shift %= digits.length;
+        int shift = sh % digits.length;
         int[] buffer = new int[shift];
 
         System.arraycopy(digits, 0, buffer, 0, shift);
@@ -16,9 +16,9 @@ public class Task07 {
 
         return numberOfDigits(digits);
     }
-    public static int rotateRight(int number, int shift){
+    public static int rotateRight(int number, int sh) {
         int[] digits = binary(number);
-        shift %= digits.length;
+        int shift = sh % digits.length;
         int[] buffer = new int[shift];
 
         System.arraycopy(digits, digits.length - shift, buffer, 0, shift);
@@ -30,24 +30,27 @@ public class Task07 {
         return numberOfDigits(digits);
     }
 
-    private static int[] binary(int number){
-        int k = number, size = 0;
-        while (k > 0){
+    private static int[] binary(int number) {
+        int k = number;
+        int size = 0;
+        int num = number;
+
+        while (k > 0) {
             size++;
             k /= 2;
         }
 
-        int [] digits = new int[size];
+        int[] digits = new int[size];
 
         int i = 0;
-        while (number > 0){
-            digits[size - 1 - i] = number % 2;
+        while (num > 0) {
+            digits[size - 1 - i] = num % 2;
             i++;
-            number /= 2;
+            num /= 2;
         }
         return digits;
     }
-    private static int numberOfDigits(int [] digits){
+    private static int numberOfDigits(int[] digits) {
         int number = 0;
         for (int digit : digits) {
             number *= 2;
