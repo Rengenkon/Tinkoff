@@ -32,7 +32,7 @@ public class Task05 {
 
             n %= tens;
             n /= NUMBER_SYSTEM;
-            tens /= NUMBER_SYSTEM * NUMBER_SYSTEM;
+            tens /= (NUMBER_SYSTEM * NUMBER_SYSTEM);
         }
         return true;
     }
@@ -66,12 +66,12 @@ public class Task05 {
             long tens = tens(c);
             long lc = c / tens + (c / (tens / NUMBER_SYSTEM)) % NUMBER_SYSTEM;
             long rc = 0;
-            if (c > NUMBER_SYSTEM * NUMBER_SYSTEM) {
-                rc = c % NUMBER_SYSTEM + (c % NUMBER_SYSTEM * NUMBER_SYSTEM) / NUMBER_SYSTEM;
+            if (c > (NUMBER_SYSTEM * NUMBER_SYSTEM)) {
+                rc = c % NUMBER_SYSTEM + (c % (NUMBER_SYSTEM * NUMBER_SYSTEM)) / NUMBER_SYSTEM;
             }
 
             if (lc >= NUMBER_SYSTEM) {
-                left *= NUMBER_SYSTEM * NUMBER_SYSTEM;
+                left *= (NUMBER_SYSTEM * NUMBER_SYSTEM);
             } else {
                 left *= NUMBER_SYSTEM;
             }
@@ -84,7 +84,7 @@ public class Task05 {
             }
 
             c %= (tens / NUMBER_SYSTEM);
-            c /= NUMBER_SYSTEM * NUMBER_SYSTEM;
+            c /= (NUMBER_SYSTEM * NUMBER_SYSTEM);
         }
 
         if (right == 0) {
