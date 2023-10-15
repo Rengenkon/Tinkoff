@@ -1,13 +1,13 @@
 package edu.hw01;
 
 public class Task01 {
-
     private static final int SEC_IN_MIN = 60;
+
     private Task01() {}
 
     public static int minutesToSeconds(String time) {
-
         String[] numbers = time.split(":");
+
         int minutes =  Integer.parseInt(numbers[0]);
         int seconds = Integer.parseInt(numbers[1]);
 

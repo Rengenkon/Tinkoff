@@ -1,72 +1,103 @@
 package edu.hw01;
 
 public class Task05 {
-    private Task05(){}
 
-    public static boolean isPalindromeDescendant(long number){
+    private static final int NUMBER_SYSTEM = 10;
+    private static final int FOUR = 4;
+
+    private Task05() {}
+
+    public static boolean isPalindromeDescendant(long number) {
         long c = number;
-        while (c >= 10){
-            if (isPalindrome(c)) return true;
+        while (c >= NUMBER_SYSTEM) {
+            if (isPalindrome(c)) {
+                return true;
+            }
             c = descendant(c);
         }
         return false;
     }
-    private static boolean isPalindrome(long n){
+
+    private static boolean isPalindrome(long num) {
+        long n = num;
         long tens = tens(n);
-        while (n > 0){
-            long l = n / tens, r = n % 10;
-            if (l != r) return false;
+
+        while (n > 0) {
+            long l = n / tens;
+            long r = n % NUMBER_SYSTEM;
+
+            if (l != r) {
+                return false;
+            }
 
             n %= tens;
-            n /=10;
-            tens /= 100;
+            n /= NUMBER_SYSTEM;
+            tens /= NUMBER_SYSTEM * NUMBER_SYSTEM;
         }
         return true;
     }
 
-    private static long descendant(long n){
-        long left = 0, right = 0;
+    private static long descendant(long n) {
+        long left = 0;
+        long right = 0;
 
         //как обрабатывать длину 2k + 1, 4k + 1 - нормально
         long c = n;
         int k = 0;
-        while (c > 0){
+        while (c > 0) {
             k++;
-            c /= 10;
+            c /= NUMBER_SYSTEM;
         }
         k--;
-        if (k % 2 == 0 && k % 4 != 0) return -1;
 
-
-        while (n > 0){
-            if (n < 10){//сработает только при начальном числе из 4k + 1 цифр
-                left *= 10;
-                left += n;
-                break;
-            };
-
-            long tens = tens(n), lc = n / tens + (n / (tens / 10)) % 10;
-            long rc = 0;
-            if (n > 100) rc = n % 10 + (n % 100) / 10;
-
-            if (lc >= 10) left *= 100;
-            else left *= 10;
-            left += lc;
-
-            if (right == 0) right += rc;
-            else right += rc * 10 * tens(right);
-
-            n %= (tens / 10);
-            n /= 100;
+        if (k % 2 == 0 && k % FOUR != 0) {
+            return -1;
         }
 
-        if (right == 0) return left;
-        return left * 10 * tens(right) + right;
+        c = n;
+        while (c > 0) {
+            //сработает только при начальном числе из 4k + 1 цифр
+            if (c < NUMBER_SYSTEM) {
+                left *= NUMBER_SYSTEM;
+                left += c;
+                break;
+            }
+
+            long tens = tens(c);
+            long lc = c / tens + (c / (tens / NUMBER_SYSTEM)) % NUMBER_SYSTEM;
+            long rc = 0;
+            if (c > NUMBER_SYSTEM * NUMBER_SYSTEM) {
+                rc = c % NUMBER_SYSTEM + (c % NUMBER_SYSTEM * NUMBER_SYSTEM) / NUMBER_SYSTEM;
+            }
+
+            if (lc >= NUMBER_SYSTEM) {
+                left *= NUMBER_SYSTEM * NUMBER_SYSTEM;
+            } else {
+                left *= NUMBER_SYSTEM;
+            }
+            left += lc;
+
+            if (right == 0) {
+                right += rc;
+            } else {
+                right += rc * NUMBER_SYSTEM * tens(right);
+            }
+
+            c %= (tens / NUMBER_SYSTEM);
+            c /= NUMBER_SYSTEM * NUMBER_SYSTEM;
+        }
+
+        if (right == 0) {
+            return left;
+        }
+
+        return left * NUMBER_SYSTEM * tens(right) + right;
     }
-    private static long tens(long n){
+
+    private static long tens(long n) {
         long c = 1;
-        while (n / c >= 10){
-            c *= 10;
+        while (n / c >= NUMBER_SYSTEM) {
+            c *= NUMBER_SYSTEM;
         }
         return c;
     }

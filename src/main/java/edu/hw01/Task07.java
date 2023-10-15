@@ -16,6 +16,7 @@ public class Task07 {
 
         return numberOfDigits(digits);
     }
+
     public static int rotateRight(int number, int sh) {
         int[] digits = binary(number);
         int shift = sh % digits.length;
@@ -48,8 +49,10 @@ public class Task07 {
             i++;
             num /= 2;
         }
+
         return digits;
     }
+
     private static int numberOfDigits(int[] digits) {
         int number = 0;
         for (int digit : digits) {

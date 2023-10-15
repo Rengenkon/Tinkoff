@@ -12,6 +12,7 @@ public class Task04 {
             fixStr.append(chars[i * 2 + 1])
                 .append(chars[i * 2]);
         }
+
         if (len % 2 == 1) {
             fixStr.append(chars[len - 1]);
         }

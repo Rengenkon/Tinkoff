@@ -2,6 +2,7 @@ package edu.hw01;
 
 public class Task08 {
     private static final int FIELD_SIZE = 8;
+
     private Task08() {}
 
     public static boolean knightBoardCapture(int[][] field) {
@@ -9,6 +10,7 @@ public class Task08 {
             for (int j = 0; j < FIELD_SIZE; j++) {
                 if (field[i][j] == 1) {
                     int[][] validMoves = validMoves(i, j);
+
                     for (int[] move : validMoves) {
                         if (move[0] != -1 && field[move[0]][move[1]] == 1) {
                             return false;
