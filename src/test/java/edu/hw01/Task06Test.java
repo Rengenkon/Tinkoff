@@ -1,7 +1,10 @@
 package edu.hw01;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import java.util.Arrays;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DisplayName("Постоянная Капрекара")
@@ -86,14 +89,17 @@ public class Task06Test {
 
 
     @Test
-    @DisplayName("3258")
-    void f32582(){
-        //given
-        int number = 9998;
-        //when
-        int count = Task06.countK(number);
-        //then
-        assertThat(count)
-            .isEqualTo(1);
+    @DisplayName("Проход по всем значеням")
+    void f32312(){
+        Logger LOGGER = LogManager.getLogger();
+        int[] stat = new int[8];
+        for (int i = 1001; i < 10000; i++) {
+            if (i % 1111 == 0) continue;
+            stat[Task06.countK(i)]++;
+        }
+
+        for (int i = 0; i < 8; i++) {
+            LOGGER.info("количество шагов " + i + "\tколичсетво значений " + stat[i]);
+        }
     }
 }

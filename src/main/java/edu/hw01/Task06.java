@@ -10,6 +10,10 @@ public class Task06 {
     private Task06() {}
 
     public static int countK(int num) {
+        if (!valid(num)) {
+            return -1;
+        }
+
         int number = num;
 
         if (number == KAPREKAR) {
@@ -34,5 +38,15 @@ public class Task06 {
         }
 
         return 1 + countK(nextNumber);
+    }
+
+    private static boolean valid(int num) {
+        if (num <= 1000 || num >= 10000) {
+            return false;
+        }
+        if (num % 1111 == 0) {
+            return false;
+        }
+        return true;
     }
 }
