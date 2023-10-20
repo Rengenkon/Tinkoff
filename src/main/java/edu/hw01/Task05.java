@@ -8,8 +8,9 @@ public class Task05 {
     private Task05() {}
 
     public static boolean isPalindromeDescendant(long number) {
-        long c = number;
-        while (c >= NUMBER_SYSTEM) {
+        int[] c = numbers(number);
+
+        while (c.length > 1) {
             if (isPalindrome(c)) {
                 return true;
             }
@@ -18,87 +19,82 @@ public class Task05 {
         return false;
     }
 
-    private static boolean isPalindrome(long num) {
-        long n = num;
-        long tens = tens(n);
-
-        while (n > 0) {
-            long l = n / tens;
-            long r = n % NUMBER_SYSTEM;
-
-            if (l != r) {
+    private static boolean isPalindrome(int[] num) {
+        for (int i = 0; i < num.length / 2; i++) {
+            if (num[i] != num[num.length - 1 - i]) {
                 return false;
             }
-
-            n %= tens;
-            n /= NUMBER_SYSTEM;
-            tens /= (NUMBER_SYSTEM * NUMBER_SYSTEM);
         }
         return true;
     }
 
-    private static long descendant(long n) {
-        long left = 0;
-        long right = 0;
+    private static int[] descendant(int[] n) {
+        long next = 0;
+        int k = n.length;
+        long lc;
 
-        //как обрабатывать длину 2k + 1, 4k + 1 - нормально
-        long c = n;
-        int k = 0;
-        while (c > 0) {
-            k++;
-            c /= NUMBER_SYSTEM;
-        }
-        k--;
-
-        if (k % 2 == 0 && k % FOUR != 0) {
-            return -1;
+        if ((k -1) % 2 == 0 && (k -1) % FOUR != 0) {
+            //как обрабатывать длину 2k + 1?     4k + 1 - нормально
+            return new int[] {-1};
         }
 
-        c = n;
-        while (c > 0) {
-            //сработает только при начальном числе из 4k + 1 цифр
-            if (c < NUMBER_SYSTEM) {
-                left *= NUMBER_SYSTEM;
-                left += c;
-                break;
-            }
-
-            long tens = tens(c);
-            long lc = c / tens + (c / (tens / NUMBER_SYSTEM)) % NUMBER_SYSTEM;
-            long rc = 0;
-            if (c > (NUMBER_SYSTEM * NUMBER_SYSTEM)) {
-                rc = c % NUMBER_SYSTEM + (c % (NUMBER_SYSTEM * NUMBER_SYSTEM)) / NUMBER_SYSTEM;
-            }
+        for (int i = 0; i < k / 4; i++) {//не зайдем сдлинной 2
+            lc = n[i * 2] + n[i * 2 + 1];
 
             if (lc >= NUMBER_SYSTEM) {
-                left *= (NUMBER_SYSTEM * NUMBER_SYSTEM);
-            } else {
-                left *= NUMBER_SYSTEM;
+                next *= NUMBER_SYSTEM;
             }
-            left += lc;
+            next *= NUMBER_SYSTEM;
+            next += lc;
+        }
+        int shift = k / 2;
+        if (k % 4 == 1) {
+            next *= NUMBER_SYSTEM;
+            next += n[k / 2];
+            shift++;
+        }
+        if (k % 4 == 2) {
+            lc = n[k / 2] + n[k / 2 - 1];
 
-            if (right == 0) {
-                right += rc;
-            } else {
-                right += rc * NUMBER_SYSTEM * tens(right);
+            if (lc >= NUMBER_SYSTEM) {
+                next *= NUMBER_SYSTEM;
             }
-
-            c %= (tens / NUMBER_SYSTEM);
-            c /= (NUMBER_SYSTEM * NUMBER_SYSTEM);
+            next *= NUMBER_SYSTEM;
+            next += lc;
+            shift++;
         }
 
-        if (right == 0) {
-            return left;
-        }
 
-        return left * NUMBER_SYSTEM * tens(right) + right;
+        for (int i = 0; i < k / 4; i++) {
+            lc = n[shift + i * 2] + n[shift + i * 2 + 1];
+
+            if (lc >= NUMBER_SYSTEM) {
+                next *= NUMBER_SYSTEM;
+            }
+            next *= NUMBER_SYSTEM;
+            next += lc;
+        }
+        return numbers(next);
     }
 
-    private static long tens(long n) {
-        long c = 1;
-        while (n / c >= NUMBER_SYSTEM) {
-            c *= NUMBER_SYSTEM;
+    private static int[] numbers (long n){
+        long c = n;
+        int k =0;
+        while(c > 0){
+            k++;
+            c /= 10;
         }
-        return c;
+        int[] numbers = new int [k];
+        int i = k - 1;
+        c = n;
+
+
+        while (c > 0){
+            numbers[i] = (int)(c % NUMBER_SYSTEM);
+            i--;
+            c /= NUMBER_SYSTEM;
+        }
+
+        return numbers;
     }
 }

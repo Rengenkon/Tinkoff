@@ -130,4 +130,51 @@ public class Task05Test {
         assertThat(palindrome)
             .isEqualTo(true);
     }
+
+
+    @Test
+    @DisplayName("Тест из примера 1")
+    void f20(){
+        //given
+        long number = 11211230;
+        //when
+        boolean palindrome = Task05.isPalindromeDescendant(number);
+        //then
+        assertThat(palindrome)
+            .isEqualTo(true);
+    }
+    @Test
+    @DisplayName("Тест из примера 2")
+    void f21(){
+        //given
+        long number = 13001120;
+        //when
+        boolean palindrome = Task05.isPalindromeDescendant(number);
+        //then
+        assertThat(palindrome)
+            .isEqualTo(true);
+    }
+    @Test
+    @DisplayName("Тест из примера 3")
+    void f22(){
+        //given
+        long number = 23336014;
+        //when
+        boolean palindrome = Task05.isPalindromeDescendant(number);
+        //then
+        assertThat(palindrome)
+            .isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("Правые значимые нули")
+    void f23(){
+        //given
+        long number = 5600;
+        //when
+        boolean palindrome = Task05.isPalindromeDescendant(number);
+        //then
+        assertThat(palindrome)
+            .isEqualTo(false);
+    }
 }

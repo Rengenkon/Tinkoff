@@ -8,6 +8,10 @@ public class Task01 {
     public static int minutesToSeconds(String time) {
         String[] numbers = time.split(":");
 
+        if (numbers.length != 2){
+            return -1;
+        }
+
         int minutes =  Integer.parseInt(numbers[0]);
         int seconds = Integer.parseInt(numbers[1]);
 
