@@ -6,6 +6,7 @@ public class Task06 {
     private static final int DIGIT = 4;
     private static final int NUMBER_SYSTEM = 10;
     private static final int KAPREKAR = 6174;
+    private static final int INF_VALUE = 1111;
 
     private Task06() {}
 
@@ -41,10 +42,11 @@ public class Task06 {
     }
 
     private static boolean valid(int num) {
-        if (num <= 1000 || num >= 10000) {
+        int t = NUMBER_SYSTEM * NUMBER_SYSTEM * NUMBER_SYSTEM;
+        if (num <= t || num >= t * NUMBER_SYSTEM) {
             return false;
         }
-        if (num % 1111 == 0) {
+        if (num % INF_VALUE == 0) {
             return false;
         }
         return true;
