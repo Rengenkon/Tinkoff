@@ -33,12 +33,13 @@ public class Task05 {
         int k = n.length;
         long lc;
 
-        if ((k -1) % 2 == 0 && (k -1) % FOUR != 0) {
+        if ((k - 1) % 2 == 0 && (k - 1) % FOUR != 0) {
             //как обрабатывать длину 2k + 1?     4k + 1 - нормально
-            return new int[] {-1};
+            return new int[] {};
         }
 
-        for (int i = 0; i < k / 4; i++) {//не зайдем сдлинной 2
+        for (int i = 0; i < k / FOUR; i++) {
+            //не зайдем сдлинной 2
             lc = n[i * 2] + n[i * 2 + 1];
 
             if (lc >= NUMBER_SYSTEM) {
@@ -47,13 +48,15 @@ public class Task05 {
             next *= NUMBER_SYSTEM;
             next += lc;
         }
+
         int shift = k / 2;
-        if (k % 4 == 1) {
+
+        if (k % FOUR == 1) {
             next *= NUMBER_SYSTEM;
             next += n[k / 2];
             shift++;
         }
-        if (k % 4 == 2) {
+        if (k % FOUR == 2) {
             lc = n[k / 2] + n[k / 2 - 1];
 
             if (lc >= NUMBER_SYSTEM) {
@@ -65,7 +68,7 @@ public class Task05 {
         }
 
 
-        for (int i = 0; i < k / 4; i++) {
+        for (int i = 0; i < k / FOUR; i++) {
             lc = n[shift + i * 2] + n[shift + i * 2 + 1];
 
             if (lc >= NUMBER_SYSTEM) {
@@ -77,20 +80,22 @@ public class Task05 {
         return numbers(next);
     }
 
-    private static int[] numbers (long n){
+    private static int[] numbers(long n) {
+
         long c = n;
-        int k =0;
-        while(c > 0){
+        int k = 0;
+
+        while (c > 0) {
             k++;
-            c /= 10;
+            c /= NUMBER_SYSTEM;
         }
-        int[] numbers = new int [k];
+
+        int[] numbers = new int[k];
         int i = k - 1;
         c = n;
 
-
-        while (c > 0){
-            numbers[i] = (int)(c % NUMBER_SYSTEM);
+        while (c > 0) {
+            numbers[i] = (int) (c % NUMBER_SYSTEM);
             i--;
             c /= NUMBER_SYSTEM;
         }

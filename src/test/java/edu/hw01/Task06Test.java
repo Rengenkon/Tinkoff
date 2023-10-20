@@ -7,7 +7,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @DisplayName("Постоянная Капрекара")
 public class Task06Test {
     @Test
-    @DisplayName("6174")
+    @DisplayName("Число Капрекара")
     void f6174(){
         //given
         int number = 6174;
@@ -18,7 +18,7 @@ public class Task06Test {
             .isEqualTo(0);
     }
     @Test
-    @DisplayName("1234")
+    @DisplayName("Пример 4")
     void f1234(){
         //given
         int number = 1234;
@@ -29,7 +29,7 @@ public class Task06Test {
             .isEqualTo(3);
     }
     @Test
-    @DisplayName("6554")
+    @DisplayName("Пример 3")
     void f6554(){
         //given
         int number = 6554;
@@ -40,7 +40,7 @@ public class Task06Test {
             .isEqualTo(4);
     }
     @Test
-    @DisplayName("6621")
+    @DisplayName("Пример 2")
     void f6621(){
         //given
         int number = 6621;
@@ -49,6 +49,17 @@ public class Task06Test {
         //then
         assertThat(count)
             .isEqualTo(5);
+    }
+    @Test
+    @DisplayName("Пример 1")
+    void f83524(){
+        //given
+        int number = 3524;
+        //when
+        int count = Task06.countK(number);
+        //then
+        assertThat(count)
+            .isEqualTo(3);
     }
     @Test
     @DisplayName("8073")
@@ -66,6 +77,19 @@ public class Task06Test {
     void f3258(){
         //given
         int number = 3258;
+        //when
+        int count = Task06.countK(number);
+        //then
+        assertThat(count)
+            .isEqualTo(1);
+    }
+
+
+    @Test
+    @DisplayName("3258")
+    void f32582(){
+        //given
+        int number = 9998;
         //when
         int count = Task06.countK(number);
         //then

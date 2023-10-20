@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DisplayName("Циклический битовый сдвиг")
-public class Task07Test {
+public class Task07TestBinary {
     @Test
     @DisplayName("1")
     void f1(){
