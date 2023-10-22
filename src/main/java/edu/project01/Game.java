@@ -1,36 +1,51 @@
 package edu.project01;
 
 import java.util.Scanner;
+import static java.lang.StringTemplate.STR;
 
 public class Game {
 
-    private static final int TRYS = 5;
-    private static int usedTrys;
-    private static String HIDDEM_WORD;
+    private static final int TRY = 5;
+    private int fail;
+    private final Word word;
     private static final Scanner scanner = new Scanner(System.in);
 
     public Game() {
-        this("random from pull");
+        this(SetWords.getWord());
     }
 
     public Game(String word) {
-        HIDDEM_WORD = word;
-
-        usedTrys = 0;
+        this.word = new Word(word);
+        fail = 0;
     }
 
-    public static void start() {
-        while (usedTrys != TRYS) {
-            char c;
+    public void start() {
+        char c;
+        while (true) {
             try {
                 c = input();
             }catch (Exception e) {
                 System.out.println(e.getMessage());
                 break;
             }
-            usedTrys++;
 
-            if (HIDDEM_WORD)
+            if (word.inWord(c)) {
+                System.out.println("Hit!");
+                word.editMask(c);
+            }else {
+                fail++;
+                System.out.println(STR."Missed, mistake \{fail} out of 5.");
+            }
+
+            System.out.println(word.getMask());
+
+            if (word.end()) {
+                System.out.println("You won!");
+                break;
+            } else if (fail == TRY) {
+                System.out.println("You lost!");
+                break;
+            }
         }
     }
 
@@ -45,6 +60,7 @@ public class Game {
         }else{
             input();
         }
+
         throw new Exception("atypical input".toUpperCase());
     }
 }
