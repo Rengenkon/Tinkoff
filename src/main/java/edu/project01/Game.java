@@ -1,22 +1,33 @@
 package edu.project01;
 
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.Scanner;
+
 import static java.lang.StringTemplate.STR;
 
 public class Game {
 
     private static final int TRY = 5;
+    private final PrintStream out;
     private int fail;
     private final Word word;
-    private static final Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner;
 
     public Game() {
         this(SetWords.getWord());
     }
 
     public Game(String word) {
-        this.word = new Word(word);
+        this(word, System.in, System.out);
+    }
+
+    public Game(String word, InputStream in, PrintStream out){
+        this.word = new Word(word.toLowerCase());
         fail = 0;
+
+        scanner = new Scanner(in);
+        this.out = out;
     }
 
     public void start() {
@@ -25,32 +36,32 @@ public class Game {
             try {
                 c = input();
             }catch (Exception e) {
-                System.out.println(e.getMessage());
+                out.println(e.getMessage());
                 break;
             }
 
             if (word.inWord(c)) {
-                System.out.println("Hit!");
+                out.println("Hit!");
                 word.editMask(c);
             }else {
                 fail++;
-                System.out.println(STR."Missed, mistake \{fail} out of 5.");
+                out.println(STR."Missed, mistake \{fail} out of 5.");
             }
 
-            System.out.println(word.getMask());
+            out.println(word.getMask());
 
             if (word.end()) {
-                System.out.println("You won!");
+                out.println("You won!");
                 break;
             } else if (fail == TRY) {
-                System.out.println("You lost!");
+                out.println("You lost!");
                 break;
             }
         }
     }
 
-    private static char input() throws Exception {
-        System.out.println("Guess a letter:");
+    private char input() throws Exception {
+        out.println("Guess a letter:");
         String str = scanner.next();
 
         if (str.length() == 1 && Character.isLetter(str.charAt(0))) {
@@ -58,9 +69,8 @@ public class Game {
         } else if (str.equals("EXIT")) {
             throw new Exception("Game over");
         }else{
-            input();
+            out.println("Incorrect input");
+            return input();
         }
-
-        throw new Exception("atypical input".toUpperCase());
     }
 }
