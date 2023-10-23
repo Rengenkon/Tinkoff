@@ -43,7 +43,7 @@ public class Game {
         while (true) {
             try {
                 c = input();
-            }catch (Exception e) {
+            } catch (Exception e) {
                 out.println(e.getMessage());
                 break;
             }
@@ -51,7 +51,7 @@ public class Game {
             if (word.inWord(c)) {
                 out.println("Hit!");
                 word.editMask(c);
-            }else {
+            } else {
                 fail++;
                 out.println(STR."Missed, mistake \{fail} out of 5.");
             }
@@ -76,7 +76,7 @@ public class Game {
             return str.toLowerCase().charAt(0);
         } else if (str.equals("EXIT")) {
             throw new Exception("Game over");
-        }else{
+        } else {
             out.println("Incorrect input");
             return input();
         }

@@ -5,7 +5,7 @@ public class Main {
         try {
             Game game = new Game("test");
             game.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
