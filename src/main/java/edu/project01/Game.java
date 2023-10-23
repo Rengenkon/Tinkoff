@@ -1,6 +1,8 @@
 package edu.project01;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Scanner;
 
@@ -14,20 +16,21 @@ public class Game {
     private final Word word;
     private static final int MIN_LENGTH = 3;
     private static final int MAX_LENGTH = 5;
-    private final Scanner scanner;
+
+    private final BufferedReader br;
 
     public Game() throws Exception {
         this(SetWords.getWord());
     }
 
     public Game(String word) throws Exception {
-        this(word, System.in, System.out);
+        this(word, new BufferedReader(new InputStreamReader(System.in)), System.out);
     }
 
-    public Game(String word, InputStream in, PrintStream out) throws Exception {
+    public Game(String word, BufferedReader br, PrintStream out) throws Exception {
         fail = 0;
 
-        scanner = new Scanner(in);
+        this.br = br;
         this.out = out;
 
         if (valid(word)) {
@@ -69,7 +72,7 @@ public class Game {
 
     private char input() throws Exception {
         out.println("Guess a letter:");
-        String str = scanner.next();
+        String str = br.readLine();
 
         if (str.length() == 1 && Character.isLetter(str.charAt(0))) {
             return str.toLowerCase().charAt(0);
