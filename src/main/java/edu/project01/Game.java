@@ -1,10 +1,8 @@
 package edu.project01;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.Scanner;
 
 import static java.lang.StringTemplate.STR;
 
@@ -36,7 +34,7 @@ public class Game {
         if (valid(word)) {
             this.word = new Word(word.toLowerCase());
         } else {
-            throw new Exception("A short word to start");
+            throw new Exception("Inappropriate word length");
         }
     }
 
