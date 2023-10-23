@@ -2,7 +2,11 @@ package edu.project01;
 
 public class Main {
     public static void main(String[] args) {
-        Game game = new Game("test");
-        game.start();
+        try {
+            Game game = new Game("test");
+            game.start();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 }

@@ -12,22 +12,29 @@ public class Game {
     private final PrintStream out;
     private int fail;
     private final Word word;
+    private static final int MIN_LENGTH = 3;
+    private static final int MAX_LENGTH = 5;
     private final Scanner scanner;
 
-    public Game() {
+    public Game() throws Exception {
         this(SetWords.getWord());
     }
 
-    public Game(String word) {
+    public Game(String word) throws Exception {
         this(word, System.in, System.out);
     }
 
-    public Game(String word, InputStream in, PrintStream out){
-        this.word = new Word(word.toLowerCase());
+    public Game(String word, InputStream in, PrintStream out) throws Exception {
         fail = 0;
 
         scanner = new Scanner(in);
         this.out = out;
+
+        if (valid(word)) {
+            this.word = new Word(word.toLowerCase());
+        } else {
+            throw new Exception("A short word to start");
+        }
     }
 
     public void start() {
@@ -72,5 +79,9 @@ public class Game {
             out.println("Incorrect input");
             return input();
         }
+    }
+
+    private boolean valid(String word) {
+        return word.length() >= MIN_LENGTH  && word.length() <= MAX_LENGTH;
     }
 }

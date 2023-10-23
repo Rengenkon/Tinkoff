@@ -27,7 +27,12 @@ public class ATest {
     @DisplayName("")
     void nul (){
         //given
-        Game game = new Game("", modIn, modOut);
+        try {
+            Game game = new Game("", modIn, modOut);
+            game.start();
+        }catch (Exception e){
+            modOut.println(e.getMessage());
+        }
         //when
         //then
     }
