@@ -3,6 +3,8 @@ package edu.project01;
 import java.util.Random;
 
 public class SetWords {
+    private SetWords() {}
+
     private static final String[] SET_WORDS = {
         "test",
         "Mouse"
