@@ -25,10 +25,10 @@ public final class PopularCommandExecutor {
                 }
             }
             throw new ConnectionException();
-        } catch (ConnectionException e){
+        } catch (ConnectionException e) {
             //ConnectionException при превышении количества попыток
             throw new RuntimeException(e);
-        } catch(Exception e) {
+        } catch (Exception e) {
             //Exception при Conection.close
             throw new RuntimeException(e);
         }
