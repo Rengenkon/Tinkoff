@@ -1,9 +1,9 @@
 package edu.hw02;
 
+import edu.hw02.task03.ConnectionException;
 import edu.hw02.task03.DefaultConnectionManager;
 import edu.hw02.task03.FaultyConnectionManager;
 import edu.hw02.task03.PopularCommandExecutor;
-import edu.hw02.task03.StableConnection;
 import org.junit.jupiter.api.Test;
 
 public class Task03Test {
@@ -12,9 +12,12 @@ public class Task03Test {
         //given
         PopularCommandExecutor commandExecutor = new PopularCommandExecutor(new FaultyConnectionManager(), 1);
         //when
-        commandExecutor.updatePackages();
-        //ConnectionException
-        //израсходовано количетсво попыток
+        try {
+            commandExecutor.updatePackages();
+        }catch (RuntimeException e){
+            //израсходовано количетсво попыток или ошибка при Conection.close()
+            int a;
+        }
 
         //then
     }

@@ -13,7 +13,7 @@ public final class PopularCommandExecutor {
         tryExecute("apt update && apt upgrade -y");
     }
 
-    void tryExecute(String command) {
+    private void tryExecute(String command) {
         int trys = 0;
         try (Connection connection = manager.getConnection()) {
             while (trys != maxAttempts) {
@@ -25,8 +25,11 @@ public final class PopularCommandExecutor {
                 }
             }
             throw new ConnectionException();
-        } catch (Exception e) {
-            // не выкинется, так как в close() нет trow
+        } catch (ConnectionException e){
+            //ConnectionException при превышении количества попыток
+            throw new RuntimeException(e);
+        } catch(Exception e) {
+            //Exception при Conection.close
             throw new RuntimeException(e);
         }
     }
