@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public abstract class Maze {
-    Random generator;
+    protected Random generator;
     protected record Point(int height, int weight){}
     protected Point start;
     protected Point end;
-    private int[][] ans;
     protected final int mazeHeight;
     protected final int mazeWeight;
+    private int[][] ans;
 
-    protected static final int START = 10000;
-    protected static final int END = 20000;
-    protected static final int WAY = -1;
-    protected static final int WALL = 1;
-    protected static final int NONE = 0;
+    public static final int START = 10000;
+    public static final int END = 20000;
+    public static final int WAY = -1;
+    public static final int WALL = 1;
+    public static final int NONE = 0;
 
     public Maze(int n, int m){
         this(Math.max(n, 3), Math.max(m, 3), System.currentTimeMillis());
@@ -85,7 +85,35 @@ public abstract class Maze {
 
     private Point nextPoint(Point x) {
         ArrayList<Point> possible = new ArrayList<>(3);
-        Point[] allWays = null;
+        Point[] allWays = getWays(x);
+
+        for (var way : allWays) {
+            if (end.height == way.height && end.weight == way.weight) {
+                return way;
+            }else if (way.height <= 0 || way.height >= mazeHeight - 1 || way.weight <= 0 || way.weight >= mazeWeight - 1){
+                continue;
+            }else {
+                int value = ans[way.height][way.weight];
+                if (value == WAY) {
+                    continue;
+                }
+                if (value == NONE) {
+                    ans[way.height][way.weight] = WALL;
+                }
+                possible.add(way);
+            }
+        }
+
+        return possible.get(generator.nextInt(possible.size()));// size == 0
+    }
+
+    private Point[] getWays(Point x) {
+        Point[] allWays = new Point[]{
+            new Point(x.height - 1, x.weight),
+            new Point(x.height + 1, x.weight),
+            new Point(x.height, x.weight - 1),
+            new Point(x.height, x.weight + 1)
+        };
 
         if (Math.abs(x.height - start.height) == mazeHeight - 2) {
             if (end.weight - x.weight < 0){
@@ -99,34 +127,8 @@ public abstract class Maze {
             }else if (end.height - x.height > 0){
                 allWays = new Point[]{new Point(x.height + 1, x.weight)};
             }
-        }else {
-            allWays = new Point[]{
-                new Point(x.height - 1, x.weight),
-                new Point(x.height + 1, x.weight),
-                new Point(x.height, x.weight - 1),
-                new Point(x.height, x.weight + 1)
-            };
         }
-
-        for (var way : allWays) {
-            if (way.height <= 0 || way.height >= mazeHeight - 1 || way.weight <= 0 || way.weight >= mazeWeight - 1){
-                continue;
-            }else {
-                int value = ans[way.height][way.weight];
-                if (value == END) {
-                    return way;
-                }
-                if (value == WAY) {
-                    continue;
-                }
-                if (value == NONE) {
-                    ans[way.height][way.weight] = WALL;
-                }
-
-                possible.add(way);
-            }
-        }
-        return possible.get(generator.nextInt(possible.size()));// size == 0
+        return allWays;
     }
 
     public int[][] getMaze() {
