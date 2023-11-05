@@ -1,40 +1,59 @@
 package edu.project02.generation;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 public abstract class Maze {
     protected Random generator;
+
     protected record Point(int height, int weight){}
     protected Point start;
     protected Point end;
+
     protected final int mazeHeight;
     protected final int mazeWeight;
-    private int[][] ans;
+    protected int[][] maze;
 
-    public static final int START = 10000;
-    public static final int END = 20000;
-    public static final int WAY = -1;
-    public static final int WALL = 1;
+    public static final int START = 100;
+    public static final int END = 101;
+    public static final int WAY = 1;
+    public static final int SECOND_WAY = 2;
+    public static final int WALL = -1;
+    public static final int BORDER = -10;
     public static final int NONE = 0;
-
-    public Maze(int n, int m){
-        this(Math.max(n, 3), Math.max(m, 3), System.currentTimeMillis());
-    }
 
     public Maze(int n, int m, long seed) {
         generator = new Random(seed);
-        mazeHeight = n;
-        mazeWeight = m;
+
+        if (n % 2 == 0){
+            n--;
+        }
+        if (m % 2 == 0){
+            m--;
+        }
+        mazeHeight = Math.max(n, 3);
+        mazeWeight = Math.max(m, 3);
+        maze = new int[mazeHeight][mazeWeight];
+
         generate();
     }
 
     private void generate() {
-        generateStart();
-        generateMainWay();
+        borders();
+        startEnd();
     }
 
-    private void generateStart() {
+    private void borders() {
+        for (int i = 1; i < mazeHeight - 1; i++) {
+            maze[i][0] = BORDER;
+            maze[i][mazeWeight - 1] = BORDER;
+        }
+        for (int i = 0; i < mazeWeight; i++) {
+            maze[0][i] = BORDER;
+            maze[mazeHeight - 1][i] = BORDER;
+        }
+    }
+
+    private void startEnd() {
         start = new Point(-1, -1);
         end = null;
         boolean validValues = false;
@@ -61,79 +80,12 @@ public abstract class Maze {
                 validValues = true;
             }
         }
+
+        maze[start.height][start.weight] = START;
+        maze[end.height][end.weight] = END;
     }
 
-    private void generateMainWay() {
-        boolean validValues = false;
-        while (!validValues) {
-            ans = new int[mazeHeight][mazeWeight];
-            ans[start.height][start.weight] = START;
-            ans[end.height][end.weight] = END;
-
-            Point ccurrent = start;
-            while (true) {
-                ccurrent = nextPoint(ccurrent);
-
-                if (ans[ccurrent.height][ccurrent.weight] == END) {
-                    validValues = true;
-                    break;
-                }
-                ans[ccurrent.height][ccurrent.weight] = WAY;
-            }
-        }
+    public int[][] getMaze(){
+        return maze.clone();
     }
-
-    private Point nextPoint(Point x) {
-        ArrayList<Point> possible = new ArrayList<>(3);
-        Point[] allWays = getWays(x);
-
-        for (var way : allWays) {
-            if (end.height == way.height && end.weight == way.weight) {
-                return way;
-            }else if (way.height <= 0 || way.height >= mazeHeight - 1 || way.weight <= 0 || way.weight >= mazeWeight - 1){
-                continue;
-            }else {
-                int value = ans[way.height][way.weight];
-                if (value == WAY) {
-                    continue;
-                }
-                if (value == NONE) {
-                    ans[way.height][way.weight] = WALL;
-                }
-                possible.add(way);
-            }
-        }
-
-        return possible.get(generator.nextInt(possible.size()));// size == 0
-    }
-
-    private Point[] getWays(Point x) {
-        Point[] allWays = new Point[]{
-            new Point(x.height - 1, x.weight),
-            new Point(x.height + 1, x.weight),
-            new Point(x.height, x.weight - 1),
-            new Point(x.height, x.weight + 1)
-        };
-
-        if (Math.abs(x.height - start.height) == mazeHeight - 2) {
-            if (end.weight - x.weight < 0){
-                allWays = new Point[]{new Point(x.height, x.weight - 1)};
-            }else if (end.weight - x.weight > 0){
-                allWays = new Point[]{new Point(x.height, x.weight + 1)};
-            }
-        }else if (Math.abs(x.weight - start.weight) == mazeWeight - 2) {
-            if (end.height - x.height < 0){
-                allWays = new Point[]{new Point(x.height - 1, x.weight)};
-            }else if (end.height - x.height > 0){
-                allWays = new Point[]{new Point(x.height + 1, x.weight)};
-            }
-        }
-        return allWays;
-    }
-
-    public int[][] getMaze() {
-        return ans.clone();
-    }
-
-    abstract protected void generateSecondsWay();
 }
