@@ -1,10 +1,11 @@
 package edu.project02;
 
-import edu.project02.generation.ImpMaze;
+import edu.project02.generation.Kraskal;
 
 public class Main {
-    public static void main(String[] args) {
-        new Display().show(new ImpMaze(20));
+    private Main() {}
 
+    public static void main(String[] args) {
+        new Display().show(new Kraskal(500));
     }
 }

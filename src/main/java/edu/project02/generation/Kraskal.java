@@ -5,20 +5,20 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.TreeSet;
 
-public class ImpMaze extends Maze{
+public class Kraskal extends Maze {
     ArrayList<Point> walls = new ArrayList<>();
     private final HashMap<Integer, TreeSet<Point>> map = new HashMap<>();
 
-    public ImpMaze(int n) {
+    public Kraskal(int n) {
         this(n, n);
     }
 
-    public ImpMaze(int n, int m) {
+    public Kraskal(int n, int m) {
         this(n, m, System.currentTimeMillis());
     }
 
-    public ImpMaze(int n, int m, long seed) {
-        super(n % 2 == 0 ? n - 1 : n, m % 2 == 0 ? m -1 : m, seed);
+    public Kraskal(int n, int m, long seed) {
+        super(n % 2 == 0 ? n - 1 : n, m % 2 == 0 ? m - 1 : m, seed);
         generate();
     }
 
@@ -30,8 +30,7 @@ public class ImpMaze extends Maze{
             walls.remove(index);
             merge(wall);
         }
-        start = new Point(-1, -1);
-        end = start;
+        startEnd();
     }
 
     private void initialization() {
@@ -44,15 +43,15 @@ public class ImpMaze extends Maze{
         }
 
         for (int i = 0; i < mazeHeight; i++) {
-            if (i % 2 == 0){
+            if (i % 2 == 0) {
                 for (int j = 1; j < mazeWeight; j += 2) {
                     walls.add(new Point(i, j));
                 }
-            }else {
+            } else {
                 for (int j = 0; j < mazeWeight; j++) {
                     if (j % 2 == 1) {
                         maze[i][j] = WALL;
-                    }else {
+                    } else {
                         walls.add(new Point(i, j));
                     }
                 }
@@ -85,7 +84,8 @@ public class ImpMaze extends Maze{
                 add(map.get(values[0]));
                 add(map.get(values[1]));
             }};
-            int min, max;
+            int min;
+            int max;
             if (treeSets.get(0) != null && treeSets.get(1) != null) {
                 min = treeSets.get(0).size() > treeSets.get(1).size() ? 1 : 0;
                 max = 1 - min;
@@ -121,6 +121,49 @@ public class ImpMaze extends Maze{
                 treeSets.get(max).add(point);
                 maze[p[min].height()][p[min].weight()] = values[max];
                 maze[point.height()][point.weight()] = values[max];
+            }
+        }
+    }
+
+    private void startEnd() {
+        final int INIT_VALUE = -10;
+        start = new Point(INIT_VALUE, INIT_VALUE);
+        end = null;
+        boolean validValues = false;
+
+        while (!validValues) {
+            int h = generator.nextInt(-1, mazeHeight + 1);
+            int w;
+            int h1;
+            int w1;
+            if (h == -1 || h == mazeHeight) {
+                w = generator.nextInt(mazeWeight);
+                w1 = w;
+                h1 = h == -1 ? 0 : h - 1;
+            } else {
+                h1 = h;
+                if (generator.nextInt(2) == 0) {
+                    w = -1;
+                    w1 = 0;
+                } else {
+                    w = mazeWeight;
+                    w1 = w - 1;
+                }
+            }
+
+            if (maze[h1][w1] != WALL) {
+                if (start.height() == INIT_VALUE) {
+                    start = new Point(h, w);
+                } else {
+                    if (start.height() == h && start.weight() - 1 <= w && start.weight() + 1 >= w) {
+                        continue;
+                    }
+                    if (start.weight() == w && start.height() - 1 <= h && start.height() + 1 >= h) {
+                        continue;
+                    }
+                    end = new Point(h, w);
+                    validValues = true;
+                }
             }
         }
     }

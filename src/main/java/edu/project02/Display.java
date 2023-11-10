@@ -10,9 +10,10 @@ public class Display {
     private static final char FINISH = '-';
     PrintStream output;
 
-    public Display(){
+    public Display() {
         this(System.out);
     }
+
     public Display(PrintStream out) {
         output = out;
     }
@@ -26,14 +27,14 @@ public class Display {
             for (int j = -1; j < mmaze.mazeWeight + 1; j++) {
                 if (i == start.height() && j == start.weight()) {
                     output.print(START);
-                }else if (i == end.height() && j == end.weight()) {
+                } else if (i == end.height() && j == end.weight()) {
                     output.print(FINISH);
-                }else if (i == -1 ||j == -1 || i == maze.length || j == maze.length) {
+                } else if (i == -1 || j == -1 || i == maze.length || j == maze.length) {
                     output.print(WALL);
-                }else {
-                    if (maze[i][j] == Maze.BORDER || maze[i][j] == Maze.WALL) {
+                } else {
+                    if (maze[i][j] == Maze.WALL) {
                         output.print(WALL);
-                    }else {
+                    } else {
                         output.print(WAY);
                     }
                 }
