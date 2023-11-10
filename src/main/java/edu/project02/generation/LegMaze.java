@@ -2,14 +2,14 @@ package edu.project02.generation;
 
 import java.util.ArrayList;
 
-public class LoopMaze extends Maze{
+public class LegMaze extends Maze{
     private static final double CHANCE_WAY = 0.5;
 
-    public LoopMaze(int n, int m){
+    public LegMaze(int n, int m){
         this(n, m, System.currentTimeMillis());
     }
 
-    public LoopMaze(int n, int m, long seed) {
+    public LegMaze(int n, int m, long seed) {
         super(n, m, seed);
 
     }
@@ -19,13 +19,13 @@ public class LoopMaze extends Maze{
         while (!validValues) {
             maze = new int[mazeHeight][mazeWeight];
             maze[start.height()][start.weight()] = START;
-            maze[end.height()][end.weight()] = END;
+            maze[end.height()][end.weight()] = FINISH;
 
             Point ccurrent = start;
             while (true) {
                 ccurrent = nextPoint(ccurrent);
 
-                if (maze[ccurrent.height()][ccurrent.weight()] == END) {
+                if (maze[ccurrent.height()][ccurrent.weight()] == FINISH) {
                     validValues = true;
                     break;
                 }

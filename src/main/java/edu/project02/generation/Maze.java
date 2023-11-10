@@ -9,17 +9,17 @@ public abstract class Maze {
     protected Point start;
     protected Point end;
 
-    protected final int mazeHeight;
-    protected final int mazeWeight;
+    public final int mazeHeight;
+    public final int mazeWeight;
     protected int[][] maze;
 
     public static final int START = -100;
-    public static final int END = -101;
+    public static final int FINISH = -101;
     public static final int WAY = -10;
-    public static final int SECOND_WAY = -20;
     public static final int WALL = -1;
-    public static final int BORDER = -10;
     public static final int NONE = 0;
+    public static final int BORDER = -10;
+    public static final int SECOND_WAY = -20;
 
     public Maze(int n, int m, long seed) {
         generator = new Random(seed);
@@ -74,7 +74,7 @@ public abstract class Maze {
         }
 
         maze[start.height][start.weight] = START;
-        maze[end.height][end.weight] = END;
+        maze[end.height][end.weight] = FINISH;
     }
 
     public int[][] getMaze(){

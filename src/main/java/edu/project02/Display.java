@@ -4,8 +4,10 @@ import java.io.PrintStream;
 import edu.project02.generation.Maze;
 
 public class Display {
-    private static final char WALL = '*';
-    private static final char WAY = '-';
+    private static final char WALL = '0';
+    private static final char WAY = '.';
+    private static final char START = '+';
+    private static final char FINISH = '-';
     PrintStream output;
 
     public Display(){
@@ -20,30 +22,23 @@ public class Display {
         Maze.Point start = mmaze.getStart();
         int[][] maze = mmaze.getMaze();
 
-        for (int i = 0; i < maze.length + 2; i++) {
-            if (i == 0 || i == maze.length + 1) {
-                for (int j = 0; j < maze.length + 2; j++) {
+        for (int i = -1; i < mmaze.mazeHeight + 1; i++) {
+            for (int j = -1; j < mmaze.mazeWeight + 1; j++) {
+                if (i == start.height() && j == start.weight()) {
+                    output.print(START);
+                }else if (i == end.height() && j == end.weight()) {
+                    output.print(FINISH);
+                }else if (i == -1 ||j == -1 || i == maze.length || j == maze.length) {
                     output.print(WALL);
-                }
-                output.println();
-            }else {
-                for (int j = 0; j < maze[i].length + 2; j++) {
-                    if (i == start.height() && j == start.weight()) {
-                        output.print(WAY);
-                    }else if (i == end.height() && j == end.weight()) {
-                        output.print(WAY);
-                    }else if (j == 0 || j == maze.length + 1) {
+                }else {
+                    if (maze[i][j] == Maze.BORDER || maze[i][j] == Maze.WALL) {
                         output.print(WALL);
                     }else {
-                        if (maze[i][j] == Maze.BORDER || maze[i][j] == Maze.WALL) {
-                            output.print(WALL);
-                        }else {
-                            output.print(maze[i][j]);
-                        }
+                        output.print(WAY);
                     }
                 }
-                output.println();
             }
+            output.println();
         }
     }
 
