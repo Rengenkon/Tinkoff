@@ -1,4 +1,4 @@
-package edu.project02.generation;
+package edu.project02;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,6 +31,13 @@ public class Kraskal extends Maze {
             merge(wall);
         }
         startEnd();
+        for (int i = 0; i < mazeHeight; i++) {
+            for (int j = 0; j < mazeWeight; j++) {
+                if (maze[i][j] != WALL) {
+                    maze[i][j] = WAY;
+                }
+            }
+        }
     }
 
     private void initialization() {

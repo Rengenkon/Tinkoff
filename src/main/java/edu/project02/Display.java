@@ -1,11 +1,11 @@
 package edu.project02;
 
 import java.io.PrintStream;
-import edu.project02.generation.Maze;
 
 public class Display {
     private static final char WALL = '0';
     private static final char WAY = '.';
+    private static final char MAIN = '*';
     private static final char START = '+';
     private static final char FINISH = '-';
     PrintStream output;
@@ -34,6 +34,8 @@ public class Display {
                 } else {
                     if (maze[i][j] == Maze.WALL) {
                         output.print(WALL);
+                    } else if (maze[i][j] == Maze.MAIN) {
+                        output.print(MAIN);
                     } else {
                         output.print(WAY);
                     }
