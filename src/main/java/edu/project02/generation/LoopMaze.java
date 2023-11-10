@@ -79,7 +79,7 @@ public class LoopMaze extends Maze{
         return all;
     }
 
-    protected void generatesWays() {
+    protected void generateWays() {
         Point ccurrent = start;
         while (true) {
             ccurrent = nextPoint(ccurrent);

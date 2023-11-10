@@ -1,9 +1,10 @@
 package edu.project02;
 
-import edu.project02.generation.LoopMaze;
+import edu.project02.generation.Tree;
 
 public class Main {
     public static void main(String[] args) {
-        new Display().show(new LoopMaze(5,3).getMaze());
+        new Display().show(new Tree(10,10));
+
     }
 }

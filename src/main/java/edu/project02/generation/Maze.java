@@ -5,7 +5,7 @@ import java.util.Random;
 public abstract class Maze {
     protected Random generator;
 
-    protected record Point(int height, int weight){}
+    public record Point(int height, int weight){}
     protected Point start;
     protected Point end;
 
@@ -13,10 +13,10 @@ public abstract class Maze {
     protected final int mazeWeight;
     protected int[][] maze;
 
-    public static final int START = 100;
-    public static final int END = 101;
-    public static final int WAY = 1;
-    public static final int SECOND_WAY = 2;
+    public static final int START = -100;
+    public static final int END = -101;
+    public static final int WAY = -10;
+    public static final int SECOND_WAY = -20;
     public static final int WALL = -1;
     public static final int BORDER = -10;
     public static final int NONE = 0;
@@ -24,17 +24,9 @@ public abstract class Maze {
     public Maze(int n, int m, long seed) {
         generator = new Random(seed);
 
-        if (n % 2 == 0){
-            n--;
-        }
-        if (m % 2 == 0){
-            m--;
-        }
         mazeHeight = Math.max(n, 3);
         mazeWeight = Math.max(m, 3);
         maze = new int[mazeHeight][mazeWeight];
-
-        generate();
     }
 
     private void generate() {
@@ -87,5 +79,13 @@ public abstract class Maze {
 
     public int[][] getMaze(){
         return maze.clone();
+    }
+
+    public Point getEnd() {
+        return end;
+    }
+
+    public Point getStart() {
+        return start;
     }
 }
