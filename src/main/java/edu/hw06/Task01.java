@@ -25,8 +25,8 @@ public class Task01 implements Map<String, String> {
     Path file;
     ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
-    Task01(String path) {
-        file = Paths.get(path);
+    Task01(Path path) {
+        file = path;
         System.out.println(file);
         if (!Files.exists(file)) {
             try {
@@ -102,7 +102,7 @@ public class Task01 implements Map<String, String> {
                     return null;
                 }
                 kv = line.split(":");
-            } while (kv[0].equals(skey));
+            } while (!kv[0].equals(skey));
             return kv[1];
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -161,7 +161,9 @@ public class Task01 implements Map<String, String> {
     @Override
     public String put(String key, String value) {
         if (this.containsKey(key)){
-            remove(key);
+            var k = new HashSet<String>();
+            k.add((String) key);
+            removeN(k);
         }
         return putNC(key, value);
     }
@@ -183,15 +185,15 @@ public class Task01 implements Map<String, String> {
     public void putAll(@NotNull Map m) {
         var k = m.keySet().iterator().next();
         if (k instanceof String && m.get(k) instanceof String) {
-            HashSet<String> oldkey = new HashSet<>();
+            HashSet<String> keyRemove = new HashSet<>();
             var keys = this.keySet();
             for (var key : m.keySet()) {
-                if (keys.contains(key)) {
-                    oldkey.add((String) key);
+                if (keys.contains((String) key)) {
+                    keyRemove.add((String) key);
                 }
                 this.put((String) key, (String) m.get(key));
             }
-            removeN(oldkey);
+            removeN(keyRemove);
         }else {
             throw new RuntimeException("Type of key or value is not String");
         }
