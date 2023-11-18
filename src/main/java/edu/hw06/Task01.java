@@ -4,11 +4,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -40,8 +40,8 @@ public class Task01 implements Map<String, String> {
     @Override
     public int size() {
         int size = 0;
-        try (var in = FileChannel.open(file, StandardOpenOption.READ)){
-            while (readLine(in) != null) {
+        try (var in = Files.newInputStream(file)){
+            while (!readLine(in).isEmpty()) {
                 size++;
             }
         } catch (IOException e) {
@@ -58,9 +58,9 @@ public class Task01 implements Map<String, String> {
     @Override
     public boolean containsKey(Object key) {
         String skey = (String)key;
-        try (var in = FileChannel.open(file, StandardOpenOption.READ)){
+        try (var in = Files.newInputStream(file)){
             String line = readLine(in);
-            while (line != null) {
+            while (!line.isEmpty()) {
                 String v = line.split(":")[0];
                 if (v.equals(skey)) {
                     return true;
@@ -76,9 +76,9 @@ public class Task01 implements Map<String, String> {
     @Override
     public boolean containsValue(Object value) {
         String svalue = (String)value;
-        try (var in = FileChannel.open(file, StandardOpenOption.READ)){
+        try (var in = Files.newInputStream(file)){
             String line = readLine(in);
-            while (line != null) {
+            while (!line.isEmpty()) {
                 String v = line.split(":")[1];
                 if (v.equals(svalue)) {
                     return true;
@@ -94,11 +94,11 @@ public class Task01 implements Map<String, String> {
     @Override
     public String get(Object key) {
         String skey = (String)key;
-        try (var in = FileChannel.open(file, StandardOpenOption.READ)){
+        try (var in = Files.newInputStream(file)){
             String[] kv;
             do {
                 String line = readLine(in);
-                if (line == null) {
+                if (line.isEmpty()) {
                     return null;
                 }
                 kv = line.split(":");
@@ -113,9 +113,9 @@ public class Task01 implements Map<String, String> {
     @Override
     public Set<String> keySet() {
         HashSet<String> set = new HashSet<>();
-        try (var in = FileChannel.open(file, StandardOpenOption.READ)){
+        try (var in = Files.newInputStream(file)){
             String line = readLine(in);
-            while (line != null) {
+            while (!line.isEmpty()) {
                 set.add(line.split(":")[0]);
                 line = readLine(in);
             }
@@ -129,10 +129,10 @@ public class Task01 implements Map<String, String> {
     @Override
     public Collection<String> values() {
         ArrayList<String> list = new ArrayList<>();
-        try (var in = FileChannel.open(file, StandardOpenOption.READ)){
+        try (var in = Files.newInputStream(file)){
             String line = readLine(in);
-            while (line != null) {
-                list.add(line.split(":")[0]);
+            while (!line.isEmpty()) {
+                list.add(line.split(":")[1]);
                 line = readLine(in);
             }
         } catch (IOException e) {
@@ -144,9 +144,9 @@ public class Task01 implements Map<String, String> {
     @Override
     public Set<Entry<String, String>> entrySet() {
         HashSet<Entry<String, String>> set = new HashSet<>();
-        try (var in = FileChannel.open(file, StandardOpenOption.READ)){
+        try (var in = Files.newInputStream(file)){
             String line = readLine(in);
-            while (line != null) {
+            while (!line.isEmpty()) {
                 String[] kv = line.split(":");
                 set.add(new AbstractMap.SimpleEntry<String, String>(kv[0], kv[1]));
                 line = readLine(in);
@@ -168,7 +168,7 @@ public class Task01 implements Map<String, String> {
         return putNC(key, value);
     }
 
-    private String putNC(String key, String value) {
+    private String putNC(String key, String value) {//------------------------------------------nio
         try (var out = FileChannel.open(file, StandardOpenOption.APPEND)){
             var b = (key + ARG_SEPARATOR + value + LINE_SEPARATOR).getBytes();
             ByteBuffer obuf = ByteBuffer.allocate(b.length);
@@ -213,10 +213,10 @@ public class Task01 implements Map<String, String> {
         HashSet<String> ans = new HashSet<>();
         Path copy = Task02.cloneFile(file);
         this.clear();
-        try (var in = FileChannel.open(copy, StandardOpenOption.READ)){
+        try (var in = Files.newInputStream(copy)){
             String[] kv;
             String line = readLine(in);
-            while (line != null) {
+            while (!line.isEmpty()) {
                 kv = line.split(":");
                 if (setKey.contains(kv[0])){
                     ans.add(kv[1]);
@@ -249,25 +249,13 @@ public class Task01 implements Map<String, String> {
     }
 
 
-    private String readLine (FileChannel file) throws IOException {
+    private String readLine (InputStream stream) throws IOException {
         StringBuilder builder = new StringBuilder();
-        int bytesRead = 0;
-        if (!buffer.hasRemaining()){
-            bytesRead = file.read(buffer);
-            buffer.flip();
+        int c = stream.read();
+        while (c != -1 && c != (int)LINE_SEPARATOR) {
+            builder.append((char) c);
+            c = stream.read();
         }
-        while (bytesRead != -1) {
-            while (buffer.hasRemaining()) {
-                char c = (char) buffer.get();
-                if (c == LINE_SEPARATOR) {
-                    return builder.toString();
-                }
-                builder.append(c);
-            }
-            buffer.clear();
-            bytesRead = file.read(buffer);
-            buffer.flip();
-        }
-        return null;
+        return builder.toString();
     }
 }

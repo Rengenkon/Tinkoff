@@ -3,6 +3,7 @@ package edu.hw06;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -217,8 +218,9 @@ public class Task01Test {
         //when
         map.put(key1, value1);
         secondMap.put(1, 0);
-        map.putAll(secondMap);
         //then
-        assertThat(map.get(key2)).isEqualTo(value2);
+        assertThrows(RuntimeException.class,() -> {
+            map.putAll(secondMap);
+        });
     }
 }
