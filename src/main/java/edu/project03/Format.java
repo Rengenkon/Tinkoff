@@ -1,22 +1,57 @@
 package edu.project03;
 
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.ArrayList;
 
 public abstract class Format {
-    private int[] sizes;
-    private Assign assign;
-    public abstract String handler(String handler);
-    public String line(String key, String[][] strings) {
-//        int countLines = -1;
-//        for (String[] lines : strings) {
-//            countLines = Math.max(countLines, lines.length);
-//        }
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < sizes.length; i++) {
+    public abstract String extension();
+    public String[] getTable(Table table, Assign assign) {
+        ArrayList<String> lines = new ArrayList<>();
+        lines.add(handler(table));
+        for (String[] line : table.getLines()) {
+            lines.add(separator(table.getSizes()));
+            lines.add(line(line, assign, table.getSizes()));
         }
+        lines.add(separator(table.getSizes()));
+        return lines.toArray(lines.toArray(new String[0]));
     }
-    public String separator();
 
-    void set(int[] size);
+    protected String handler(Table table) {
+        return table.getHandler() + "\n";
+    }
+
+    private String line(String[] line, Assign assign, int[] sizes) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < line.length; i++) {
+            builder.append('|');
+            var size = sizes[i];
+            switch (assign) {
+                case Left -> {
+                    builder.append(line[i])
+                        .repeat(' ', size - line[i].length());
+                }
+                case Center -> {
+                    builder.repeat(' ', (size - line[i].length()) / 2)
+                        .append(line[i]).
+                        repeat(' ', ((size - line[i].length()) / 2 + (size - line[i].length()) % 2));
+                }
+                case Right -> {
+                    builder.repeat(' ', size - line[i].length())
+                        .append(line[i]);
+                }
+            }
+        }
+        builder.append("|\n");
+        return builder.toString();
+    }
+
+    private String separator(int[] sizes) {
+        StringBuilder builder = new StringBuilder();
+        for (int size : sizes) {
+            builder.append('+').repeat('-', size);
+        }
+        if (!builder.isEmpty()){
+            builder.append("+\n");
+        }
+        return builder.toString();
+    }
 }
