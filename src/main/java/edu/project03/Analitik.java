@@ -17,31 +17,79 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Analitik {
+    private static final Pattern PATTERN = Pattern.compile("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}) - (.*) \\[(.*)\\] \\\"(.*)\\\" (\\d{1,}) (\\d{1,}) \\\"(.*)\\\" \\\"(.*)\\\"");
 
-    private static final Pattern PATTERN = Pattern.compile("'(\\w{1,}) - (\\w{1,}) \\[(\\w{1,})\\] ' '\"(\\w{1,})\" (\\w{1,}) (\\w{1,}) ' \"(\\w{1,})\" \"(\\w{1,})\"'");
     private static final Map<String, String> CODE_NAMES = Map.ofEntries(
         Map.entry("200", "OK"),
         Map.entry("404", "Not Found"),
         Map.entry("500", "Internal Server Error")
     );
+    private static final ArrayList<String> params = new ArrayList<>(4){{
+        add("--path");
+        add("--from");
+        add("--to");
+        add("--format");
+    }};
     private long count = 0;
     private long size = 0;
     HashMap<String, Long> res = new HashMap<>();
     HashMap<String, Long> status = new HashMap<>();
 
-    private Path[] paths;
-    private final OffsetDateTime from;
-    private final OffsetDateTime to;
-    private final Format format;
+    private ArrayList<Path> paths = new ArrayList<>();
+    private OffsetDateTime from;
+    private OffsetDateTime to;
+    private Format format;
     public static void main(String[] args) {
-        System.out.println(Arrays.toString(args));
+        new Analitik(args).anal();
     }
     private Analitik (String[] args) {
         from = OffsetDateTime.MIN;
         to = OffsetDateTime.MAX;
         format = new Markdown();
 
+        ArrayList<ArrayList<String>> argguments = new ArrayList<>(4){{
+            add(new ArrayList<>());
+            add(new ArrayList<>());
+            add(new ArrayList<>());
+            add(new ArrayList<>());
+        }};
+        int last = -1;
+        for (String arg : args) {
+            if (params.contains(arg)) {
+                last = params.indexOf(arg);
+            } else if (!arg.isEmpty()){
+                argguments.get(last).add(arg);
+            }
+        }
 
+        if (argguments.get(0).isEmpty()) {
+            throw new RuntimeException("Enter path to log file");
+        }
+
+        for (String a : argguments.get(0).toArray(new String[0])) {
+            paths.add(Paths.get(a));
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        var from = argguments.get(1);
+        if (!from.isEmpty()) {
+            var s = from.get(from.size() - 1);
+            this.from = OffsetDateTime.parse(s, formatter);
+        }
+        var to = argguments.get(2);
+        if (!to.isEmpty()) {
+            var s = to.get(to.size() - 1);
+            this.to = OffsetDateTime.parse(s, formatter);
+        }
+        if (!argguments.get(3).isEmpty()) {
+            switch (argguments.get(3).get(argguments.get(3).size() - 1)) {
+                case "markdown" -> {
+                    this.format = new Markdown();
+                }
+                case "adoc" -> {
+                    this.format = new Adoc();
+                }
+            }
+        }
     }
 
     public void anal() {
@@ -52,9 +100,12 @@ public class Analitik {
             try (var in = Files.newInputStream(path)) {
                 line = readLine(in);
                 matcher = PATTERN.matcher(line);
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                current = OffsetDateTime.of(LocalDateTime);
-                while (Duration.between(from, current).toSeconds() > 0 && Duration.between(current, to).toSeconds() < 0) {
+                matcher.find();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z");
+                current = OffsetDateTime.parse(matcher.group(3), formatter);
+                var t1 = Duration.between(from, current).toSeconds() > 0;
+                var t2 = Duration.between(current, to).toSeconds() < 0;
+                while (t1 && t2) {
                     count++;
                     var resource = matcher.group(4);
                     if (res.containsKey(resource)) {
@@ -83,11 +134,11 @@ public class Analitik {
 
             Table table = new Table("Общая информация");
             table.add(new String[]{"Метрика", "Значение"});
-            table.add(new String[]{"Файл(-ы)", Arrays.toString(paths)});
+            table.add(new String[]{"Файл(-ы)", Arrays.toString(paths.toArray(new Path[0]))});
             table.add(new String[]{"Начальная дата", from == OffsetDateTime.MIN ? "-" : from.toString()});
-            table.add(new String[]{"Конечная дата", to == OffsetDateTime.MIN ? "-" : to.toString()});
+            table.add(new String[]{"Конечная дата", to == OffsetDateTime.MAX ? "-" : to.toString()});
             table.add(new String[]{"Количество запросов", String.valueOf(count)});
-            table.add(new String[]{"Средний размер ответа", String.valueOf(size / count)});
+            table.add(new String[]{"Средний размер ответа", String.valueOf(count != 0 ?size / count : 0)});
             tables.add(table);
 
             table = new Table("Запрашиваемые ресурсы");

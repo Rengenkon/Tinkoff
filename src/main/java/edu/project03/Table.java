@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Table {
     private final String handler;
-    private ArrayList<String[]> table;
+    private ArrayList<String[]> table = new ArrayList<>();
     private int[] size;
 
     Table(String name) {
@@ -18,8 +18,8 @@ public class Table {
             throw new RuntimeException("");
         }
         table.add(line);
-        for (int i =0; i < line.length; i++) {
-            size[i] = Math.max(size.length, line[i].length());
+        for (int i = 0; i < line.length; i++) {
+            size[i] = Math.max(size[i], line[i].length());
         }
     }
 

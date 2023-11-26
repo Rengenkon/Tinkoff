@@ -7,7 +7,7 @@ public class Out {
     public static void print(OutputStream out, Format format, Table... tables) {
         try {
             for (Table table : tables) {
-                for (var l : format.getTable(table, Assign.Center)) {
+                for (var l : format.getTable(table, Align.Center)) {
                     out.write(l.getBytes());
                 }
                 out.write('\n');
