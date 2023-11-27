@@ -10,12 +10,10 @@ public class Task01Test {
     @DisplayName("sa")
     void f() {
         //given
-        Task01 task01 = new Task01();
-        int a = 1;
-        int res = a * Task01.TREAD_COUNT;
+        int n = 5;
         //when
-        int ans = task01.add(a);
+        long res = Task02.fac(n);
         //then
-        assertThat(res).isEqualTo(ans);
+        assertThat(res).isEqualTo(120);
     }
 }

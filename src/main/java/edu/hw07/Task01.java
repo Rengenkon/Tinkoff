@@ -6,23 +6,27 @@ import java.util.List;
 public class Task01 {
     public static final int TREAD_COUNT = 4;
     final Counter counter = new Counter();
-    private final Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            counter.add();
-        }
-    };
 
     public int add(int n) {
         List<Thread> threadList = new ArrayList<>(TREAD_COUNT);
         for (int i = 0; i < TREAD_COUNT; i++) {
-            threadList.add(new Thread(runnable));
+            threadList.add(new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    counter.add(n);
+                }
+            }));
         }
 
-        for (int i = 0; i < n; i++) {
+        for (Thread thread : threadList) {
+            thread.start();
+        }
+        try {
             for (Thread thread : threadList) {
-                thread.start();
+                thread.join();
             }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
         return counter.get();
     }
@@ -31,9 +35,11 @@ public class Task01 {
 class Counter{
     private volatile Integer count = 0;
 
-    public void add() {
+    public void add(int n) {
         synchronized (count) {
-            count++;
+            for (int i = 0; i < n; i++) {
+                count++;
+            }
         }
     }
 
