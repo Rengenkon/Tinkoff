@@ -25,18 +25,21 @@ public class Task01 {
         }
         return counter.get();
     }
-}
 
-class Counter {
-    private volatile Integer count = 0;
 
-    public synchronized void add(int n) {
-        for (int i = 0; i < n; i++) {
-            count++;
+    static class Counter {
+        private volatile Integer count = 0;
+
+        public synchronized void add(int n) {
+            for (int i = 0; i < n; i++) {
+                count++;
+            }
+        }
+
+        public int get() {
+            return count;
         }
     }
-
-    public int get() {
-        return count;
-    }
 }
+
+

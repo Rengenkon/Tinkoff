@@ -2,17 +2,21 @@ package edu.hw07;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class Task03 {
-    public record Person(int id, String name, String address, String phoneNumber) {}
-    private final ArrayList<Person> bd = new ArrayList<>();
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Lock r = lock.readLock();
-    private final Lock w = lock.writeLock();
+public class Task03RWL {
+    private final ArrayList<Person> bd;
+    private final Lock r;
+    private final Lock w;
+
+    public Task03RWL() {
+        bd = new ArrayList<>();
+        ReadWriteLock lock = new ReentrantReadWriteLock();
+        r = lock.readLock();
+        w = lock.writeLock();
+    }
 
     public void add(Person person) {
         w.lock();
@@ -24,11 +28,18 @@ public class Task03 {
     }
 
     public void delete(int id) {
-        w.lock();
-        try {
-            bd.remove(id);
-        } finally {
-            w.unlock();
+        r.lock();
+        for (Person person : bd) {
+            if (person.id == id) {
+                r.unlock();
+                w.lock();
+                try {
+                    bd.remove(person);
+                } finally {
+                    w.unlock();
+                }
+                break;
+            }
         }
     }
 
@@ -37,7 +48,7 @@ public class Task03 {
         try {
             ArrayList<Person> ans = new ArrayList<>(0);
             for (Person person : bd) {
-                if (Objects.equals(person.name, name)) {
+                if (person.name.equals(name)) {
                     ans.add(person);
                 }
             }
@@ -76,4 +87,6 @@ public class Task03 {
             r.unlock();
         }
     }
+
+    public record Person(int id, String name, String address, String phoneNumber) {}
 }
