@@ -4,18 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Task01 {
-    public static final int TREAD_COUNT = 4;
+    public static final int TREAD_COUNT = 8;
     final Counter counter = new Counter();
 
     public int add(int n) {
         List<Thread> threadList = new ArrayList<>(TREAD_COUNT);
         for (int i = 0; i < TREAD_COUNT; i++) {
-            threadList.add(new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    counter.add(n);
-                }
-            }));
+            threadList.add(new Thread(() -> counter.add(n)));
         }
 
         for (Thread thread : threadList) {
@@ -32,14 +27,12 @@ public class Task01 {
     }
 }
 
-class Counter{
+class Counter {
     private volatile Integer count = 0;
 
-    public void add(int n) {
-        synchronized (count) {
-            for (int i = 0; i < n; i++) {
-                count++;
-            }
+    public synchronized void add(int n) {
+        for (int i = 0; i < n; i++) {
+            count++;
         }
     }
 
