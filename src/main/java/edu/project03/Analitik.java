@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -20,82 +19,113 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Analitik {
-    private static final Pattern PATTERN = Pattern.compile("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}) - (.*) \\[(.*)\\] \\\"(.*)\\\" (\\d{1,}) (\\d{1,}) \\\"(.*)\\\" \\\"(.*)\\\"");
+    private static final String Ip_Pattern = "(\\d{1,3}\\.){3}\\d{1,3}|(\\w{0,4}:){2,7}\\w{0,4}";
+    private static final Pattern PATTERN = Pattern.compile(
+        "("+Ip_Pattern + ") - (" + Ip_Pattern + "|-) " +// ip - ip
+             "\\[(.*)\\] " +// time
+            "\\\"(.*)\\\" " +// request
+            "(\\d{1,}) " +// response code
+            "(\\d{1,}) " +// size
+            "\\\"(.*)\\\" " +// http_referer
+            "\\\"(.*)\\\"");// user_agent
+    public static class Groups{
+        private static final int InnerGroupsIP = 2;
+
+        static final int FirstIP = 1;
+        static final int SecondIP = FirstIP + InnerGroupsIP + 1;
+        static final int Time = SecondIP + InnerGroupsIP + 1;
+        static final int Request = Time + 1;
+        static final int ResponseCode = Request + 1;
+        static final int Size = ResponseCode + 1;
+        static final int Referer = Size + 1;
+        static final int UserAgent = Referer + 1;
+    }
+
+    static class Parameter {
+        static final int NONE = -1;
+        static final int PATH = 0;
+        static final int FROM = 1;
+        static final int TO = 2;
+        static final int FORMAT = 3;
+    }
 
     private static final Map<String, String> CODE_NAMES = Map.ofEntries(
         Map.entry("200", "OK"),
         Map.entry("404", "Not Found"),
         Map.entry("500", "Internal Server Error")
     );
-    private static final ArrayList<String> params = new ArrayList<>(4){{
-        add("--path");
-        add("--from");
-        add("--to");
-        add("--format");
-    }};
-    private long count = 0;
-    private long size = 0;
-    HashMap<String, Long> res = new HashMap<>();
-    HashMap<String, Long> status = new HashMap<>();
 
-    private ArrayList<Path> paths = new ArrayList<>();
+    private final ArrayList<Path> paths = new ArrayList<>();
     private OffsetDateTime from;
     private OffsetDateTime to;
     private Format format;
+
+    private long countRequests = 0;
+    private long sumSize = 0;
+    HashMap<String, Long> resources = new HashMap<>();
+    HashMap<String, Long> status = new HashMap<>();
+
     public static void main(String[] args) {
         new Analitik(args).anal();
     }
+
     private Analitik (String[] args) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         from = OffsetDateTime.MIN;
         to = OffsetDateTime.MAX;
         format = new Markdown();
+        int parameter = Parameter.NONE;
 
-        ArrayList<ArrayList<String>> argguments = new ArrayList<>(4){{
-            add(new ArrayList<>());
-            add(new ArrayList<>());
-            add(new ArrayList<>());
-            add(new ArrayList<>());
-        }};
-        int last = -1;
         for (String arg : args) {
-            if (params.contains(arg)) {
-                last = params.indexOf(arg);
-            } else if (!arg.isEmpty()){
-                argguments.get(last).add(arg);
+            switch (arg) {
+                case "--path" -> {
+                    parameter = Parameter.PATH;
+                }
+                case "--from" -> {
+                    parameter = Parameter.FROM;
+                }
+                case "--to" -> {
+                    parameter = Parameter.TO;
+                }
+                case "--format" -> {
+                    parameter = Parameter.FORMAT;
+                }
+                default -> {
+                    if (!arg.isEmpty()){
+                        switch (parameter) {
+                            case Parameter.PATH -> {
+                                paths.add(Paths.get(arg));
+                            }
+                            case Parameter.FROM -> {
+                                from = OffsetDateTime.of(LocalDate.parse(arg, formatter), LocalTime.of(0, 0), ZoneOffset.ofHours(0));
+                            }
+                            case Parameter.TO -> {
+                                to = OffsetDateTime.of(LocalDate.parse(arg, formatter), LocalTime.of(0, 0), ZoneOffset.ofHours(0));
+                            }
+                            case Parameter.FORMAT -> {
+                                switch (arg.toLowerCase()) {
+                                    case "markdown" -> this.format = new Markdown();
+                                    case "adoc" -> this.format = new Adoc();
+                                    default -> throw new RuntimeException("Argument error: unknown format");
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        if (argguments.get(0).isEmpty()) {
-            throw new RuntimeException("Enter path to log file");
-        }
-
-        for (String a : argguments.get(0).toArray(new String[0])) {
-            paths.add(Paths.get(a));
-        }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        var from = argguments.get(1);
-        if (!from.isEmpty()) {
-            var s = from.get(from.size() - 1);
-            this.from = OffsetDateTime.of(LocalDate.parse(s, formatter), LocalTime.of(0, 0), ZoneOffset.ofHours(0));
-        }
-        var to = argguments.get(2);
-        if (!to.isEmpty()) {
-            var s = to.get(to.size() - 1);
-            this.to = OffsetDateTime.of(LocalDate.parse(s, formatter), LocalTime.of(0, 0), ZoneOffset.ofHours(0));
-        }
-        if (!argguments.get(3).isEmpty()) {
-            switch (argguments.get(3).get(argguments.get(3).size() - 1)) {
-                case "markdown" -> {
-                    this.format = new Markdown();
-                }
-                case "adoc" -> {
-                    this.format = new Adoc();
-                }
-            }
+        if (paths.isEmpty()) {
+            throw new RuntimeException("Enter path to logfile");
         }
     }
 
-    public void anal() {
+    private void anal() {
+        parsing();
+        report();
+    }
+
+    private void parsing() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z");
         String line;
         Matcher matcher;
@@ -108,24 +138,22 @@ public class Analitik {
                 }
                 matcher = PATTERN.matcher(line);
                 matcher.find();
-                current = OffsetDateTime.parse(matcher.group(3), formatter);
-                var t1 = Duration.between(from, current).toSeconds() > 0;
-                var t2 = Duration.between(current, to).toSeconds() > 0;
-                while (t1 && t2) {
-                    count++;
-                    var resource = matcher.group(4);
-                    if (res.containsKey(resource)) {
-                        res.put(resource, res.get(resource) + 1);
+                current = OffsetDateTime.parse(matcher.group(Groups.Time), formatter);
+                while (Duration.between(current, to).toSeconds() > 0 && Duration.between(from, current).toSeconds() > 0) {
+                    countRequests++;
+                    var resource = matcher.group(Groups.Request);
+                    if (resources.containsKey(resource)) {
+                        resources.put(resource, resources.get(resource) + 1);
                     } else {
-                        res.put(resource, 1L);
+                        resources.put(resource, 1L);
                     }
-                    var code = matcher.group(5);
+                    var code = matcher.group(Groups.ResponseCode);
                     if (status.containsKey(code)) {
                         status.put(code, status.get(code) + 1);
                     } else {
                         status.put(code, 1L);
                     }
-                    size += Long.parseLong(matcher.group(6));
+                    sumSize += Long.parseLong(matcher.group(Groups.Size));
 
 
                     line = readLine(in);
@@ -133,16 +161,16 @@ public class Analitik {
                         break;
                     }
                     matcher = PATTERN.matcher(line);
-                    matcher.find();
-                    current = OffsetDateTime.parse(matcher.group(3), formatter);
-                    t1 = Duration.between(from, current).toSeconds() > 0;
-                    t2 = Duration.between(current, to).toSeconds() > 0;
+                    if (!matcher.find()){
+                        throw new RuntimeException("Parse error.\nFile: " + path + "\n Line number:" + countRequests
+                        + "\nLine: " + line);
+                    }
+                    current = OffsetDateTime.parse(matcher.group(Groups.Time), formatter);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        report();
     }
 
     private void report() {
@@ -154,21 +182,21 @@ public class Analitik {
             table.add(new String[]{"Файл(-ы)", Arrays.toString(paths.toArray(new Path[0]))});
             table.add(new String[]{"Начальная дата", from == OffsetDateTime.MIN ? "-" : from.toString()});
             table.add(new String[]{"Конечная дата", to == OffsetDateTime.MAX ? "-" : to.toString()});
-            table.add(new String[]{"Количество запросов", String.valueOf(count)});
-            table.add(new String[]{"Средний размер ответа", String.valueOf(count != 0 ?size / count : 0)});
+            table.add(new String[]{"Количество запросов", String.valueOf(countRequests)});
+            table.add(new String[]{"Средний размер ответа", String.valueOf(countRequests != 0 ? sumSize / countRequests : 0)});
             tables.add(table);
 
             table = new Table("Запрашиваемые ресурсы");
             table.add(new String[]{"Ресурс", "Количество"});
-            for (var key : res.keySet()) {
-                table.add(new String[]{key, String.valueOf(res.get(key))});
+            for (var key : resources.keySet()) {
+                table.add(new String[]{key, String.valueOf(resources.get(key))});
             }
             tables.add(table);
 
             table = new Table("Коды ответа");
             table.add(new String[]{"Код", "Имя", "Количество"});
             for (var key : status.keySet()) {
-                table.add(new String[]{key, CODE_NAMES.get(key), String.valueOf(res.get(key))});
+                table.add(key, CODE_NAMES.get(key), status.get(key).toString());
             }
             tables.add(table);
 

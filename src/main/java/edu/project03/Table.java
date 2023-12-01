@@ -1,12 +1,10 @@
 package edu.project03;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
 
 public class Table {
     private final String handler;
-    private ArrayList<String[]> table = new ArrayList<>();
+    private final ArrayList<String[]> table = new ArrayList<>();
     private int[] size;
 
     Table(String name) {
