@@ -6,8 +6,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,12 +76,12 @@ public class Analitik {
         var from = argguments.get(1);
         if (!from.isEmpty()) {
             var s = from.get(from.size() - 1);
-            this.from = OffsetDateTime.parse(s, formatter);
+            this.from = OffsetDateTime.of(LocalDate.parse(s, formatter), LocalTime.of(0, 0), ZoneOffset.ofHours(0));
         }
         var to = argguments.get(2);
         if (!to.isEmpty()) {
             var s = to.get(to.size() - 1);
-            this.to = OffsetDateTime.parse(s, formatter);
+            this.to = OffsetDateTime.of(LocalDate.parse(s, formatter), LocalTime.of(0, 0), ZoneOffset.ofHours(0));
         }
         if (!argguments.get(3).isEmpty()) {
             switch (argguments.get(3).get(argguments.get(3).size() - 1)) {
@@ -93,18 +96,21 @@ public class Analitik {
     }
 
     public void anal() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z");
         String line;
         Matcher matcher;
         OffsetDateTime current;
         for (Path path : paths) {
             try (var in = Files.newInputStream(path)) {
                 line = readLine(in);
+                if (line.isEmpty()) {
+                    continue;
+                }
                 matcher = PATTERN.matcher(line);
                 matcher.find();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z");
                 current = OffsetDateTime.parse(matcher.group(3), formatter);
                 var t1 = Duration.between(from, current).toSeconds() > 0;
-                var t2 = Duration.between(current, to).toSeconds() < 0;
+                var t2 = Duration.between(current, to).toSeconds() > 0;
                 while (t1 && t2) {
                     count++;
                     var resource = matcher.group(4);
@@ -120,6 +126,17 @@ public class Analitik {
                         status.put(code, 1L);
                     }
                     size += Long.parseLong(matcher.group(6));
+
+
+                    line = readLine(in);
+                    if (line.isEmpty()) {
+                        break;
+                    }
+                    matcher = PATTERN.matcher(line);
+                    matcher.find();
+                    current = OffsetDateTime.parse(matcher.group(3), formatter);
+                    t1 = Duration.between(from, current).toSeconds() > 0;
+                    t2 = Duration.between(current, to).toSeconds() > 0;
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

@@ -1,6 +1,8 @@
 package edu.project03;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class Table {
     private final String handler;
@@ -11,15 +13,21 @@ public class Table {
         handler = name;
     }
 
-    public void add(String[] line) {
+    public void add(String... line) {
+        String[] mod = line;
+        for (int i = 0; i < mod.length; i++) {
+            if (mod[i] == null) {
+                mod[i] = "";
+            }
+        }
         if (size == null) {
-            size = new int[line.length];
-        } else if (size.length != line.length) {
+            size = new int[mod.length];
+        } else if (size.length != mod.length) {
             throw new RuntimeException("");
         }
-        table.add(line);
-        for (int i = 0; i < line.length; i++) {
-            size[i] = Math.max(size[i], line[i].length());
+        table.add(mod);
+        for (int i = 0; i < mod.length; i++) {
+            size[i] = Math.max(size[i], mod[i].length());
         }
     }
 

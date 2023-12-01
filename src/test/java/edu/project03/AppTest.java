@@ -8,7 +8,8 @@ public class AppTest {
     @DisplayName("1")
     void f(){
         String[] args = new String[]{
-            "--path", "raw.githubusercontent.com_elastic_examples_master_Common Data Formats_nginx_logs_nginx_logs.txt",
+//            "--path", "raw.githubusercontent.com_elastic_examples_master_Common Data Formats_nginx_logs_nginx_logs.txt",
+            "--path", "Test",
             "--from", "",
             "--to", "2015-06-01",
             "--format", ""
