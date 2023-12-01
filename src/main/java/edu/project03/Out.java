@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class Out {
-    public static void print(OutputStream out, Format format, Table... tables) {
+    public static void print(OutputStream out, Format format, Table... tables){
+        print(out, format, Align.Center, tables);
+    }
+    public static void print(OutputStream out, Format format, Align align, Table... tables) {
         try {
             for (Table table : tables) {
-                for (var l : format.getTable(table, Align.Center)) {
-                    out.write(l.getBytes());
+                for (var line : format.getTable(table, align)) {
+                    out.write(line.getBytes());
                 }
                 out.write('\n');
             }

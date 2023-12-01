@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 
 public class Analitik {
     private static final String Ip_Pattern = "(\\d{1,3}\\.){3}\\d{1,3}|(\\w{0,4}:){2,7}\\w{0,4}";
-    private static final Pattern PATTERN = Pattern.compile(
-        "("+Ip_Pattern + ") - (" + Ip_Pattern + "|-) " +// ip - ip
+    public static final Pattern PATTERN = Pattern.compile(
+        "(" + Ip_Pattern + ") - (" + Ip_Pattern + "|-) " +// ip - ip
              "\\[(.*)\\] " +// time
             "\\\"(.*)\\\" " +// request
             "(\\d{1,}) " +// response code
@@ -139,23 +139,8 @@ public class Analitik {
                 matcher = PATTERN.matcher(line);
                 matcher.find();
                 current = OffsetDateTime.parse(matcher.group(Groups.Time), formatter);
-                while (Duration.between(current, to).toSeconds() > 0 && Duration.between(from, current).toSeconds() > 0) {
-                    countRequests++;
-                    var resource = matcher.group(Groups.Request);
-                    if (resources.containsKey(resource)) {
-                        resources.put(resource, resources.get(resource) + 1);
-                    } else {
-                        resources.put(resource, 1L);
-                    }
-                    var code = matcher.group(Groups.ResponseCode);
-                    if (status.containsKey(code)) {
-                        status.put(code, status.get(code) + 1);
-                    } else {
-                        status.put(code, 1L);
-                    }
-                    sumSize += Long.parseLong(matcher.group(Groups.Size));
-
-
+                while (Duration.between(from, current).toSeconds() > 0 && Duration.between(current, to).toSeconds() > 0) {
+                    editRecords(matcher);
                     line = readLine(in);
                     if (line.isEmpty()) {
                         break;
@@ -173,34 +158,47 @@ public class Analitik {
         }
     }
 
+    private void editRecords(Matcher matcher) {
+        countRequests++;
+        var resource = matcher.group(Groups.Request);
+        if (resources.containsKey(resource)) {
+            resources.put(resource, resources.get(resource) + 1);
+        } else {
+            resources.put(resource, 1L);
+        }
+        var code = matcher.group(Groups.ResponseCode);
+        if (status.containsKey(code)) {
+            status.put(code, status.get(code) + 1);
+        } else {
+            status.put(code, 1L);
+        }
+        sumSize += Long.parseLong(matcher.group(Groups.Size));
+    }
+
     private void report() {
-        try (var out = Files.newOutputStream(Paths.get("REPORT" + format.extension()))) {
-            ArrayList<Table> tables = new ArrayList<>();
+        Table information = new Table("Общая информация");
+        information.add("Метрика", "Значение");
+        information.add("Файл(-ы)", Arrays.toString(paths.toArray(new Path[0])));
+        information.add("Начальная дата", from == OffsetDateTime.MIN ? "-" : from.toString());
+        information.add("Конечная дата", to == OffsetDateTime.MAX ? "-" : to.toString());
+        information.add("Количество запросов", String.valueOf(countRequests));
+        information.add("Средний размер ответа", String.valueOf(countRequests != 0 ? sumSize / countRequests : 0));
 
-            Table table = new Table("Общая информация");
-            table.add(new String[]{"Метрика", "Значение"});
-            table.add(new String[]{"Файл(-ы)", Arrays.toString(paths.toArray(new Path[0]))});
-            table.add(new String[]{"Начальная дата", from == OffsetDateTime.MIN ? "-" : from.toString()});
-            table.add(new String[]{"Конечная дата", to == OffsetDateTime.MAX ? "-" : to.toString()});
-            table.add(new String[]{"Количество запросов", String.valueOf(countRequests)});
-            table.add(new String[]{"Средний размер ответа", String.valueOf(countRequests != 0 ? sumSize / countRequests : 0)});
-            tables.add(table);
+        Table resources = new Table("Запрашиваемые ресурсы");
+        resources.add("Ресурс", "Количество");
+        for (var key : this.resources.keySet()) {
+            resources.add(key, String.valueOf(this.resources.get(key)));
+        }
 
-            table = new Table("Запрашиваемые ресурсы");
-            table.add(new String[]{"Ресурс", "Количество"});
-            for (var key : resources.keySet()) {
-                table.add(new String[]{key, String.valueOf(resources.get(key))});
-            }
-            tables.add(table);
+        Table codes = new Table("Коды ответа");
+        codes.add("Код", "Имя", "Количество");
+        for (var key : status.keySet()) {
+            codes.add(key, CODE_NAMES.get(key), status.get(key).toString());
+        }
 
-            table = new Table("Коды ответа");
-            table.add(new String[]{"Код", "Имя", "Количество"});
-            for (var key : status.keySet()) {
-                table.add(key, CODE_NAMES.get(key), status.get(key).toString());
-            }
-            tables.add(table);
-
-            Out.print(out, format, tables.toArray(tables.toArray(new Table[0])));
+        try (var out = Files.newOutputStream(format.getFile())) {
+            Out.print(out, format,
+                information, resources, codes);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

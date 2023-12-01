@@ -1,17 +1,29 @@
 package edu.project03;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public abstract class Format {
     public abstract String extension();
+
+    public Path getFile() {
+        return Paths.get("Report" + extension());
+    }
+
+    public Path getFile(Path folder) {
+        return Paths.get(folder.toString() +"Report" + extension());
+    }
+
     public String[] getTable(Table table, Align align) {
         ArrayList<String> lines = new ArrayList<>();
         lines.add(handler(table));
+        var separator = separator(table.getSizes());
         for (String[] line : table.getLines()) {
-            lines.add(separator(table.getSizes()));
+            lines.add(separator);
             lines.add(line(line, align, table.getSizes()));
         }
-        lines.add(separator(table.getSizes()));
+        lines.add(separator);
         return lines.toArray(lines.toArray(new String[0]));
     }
 

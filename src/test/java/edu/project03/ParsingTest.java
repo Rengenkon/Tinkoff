@@ -11,5 +11,6 @@ public class ParsingTest {
     @Test
     void f() {
 //        Analitik.Groups;
+//        Analitik.PATTERN.matcher(myline)
     }
 }
