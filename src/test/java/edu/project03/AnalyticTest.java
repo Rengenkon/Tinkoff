@@ -3,7 +3,7 @@ package edu.project03;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class AppTest {
+public class AnalyticTest {
     @Test
     @DisplayName("1")
     void f(){

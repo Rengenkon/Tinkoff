@@ -15,7 +15,7 @@ public class Settings {
     private OffsetDateTime to;
     private Format format;
 
-    public Settings(String[] settings) {
+    public Settings(String... settings) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         int parameter = PARAMETERS.NONE;

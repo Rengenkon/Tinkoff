@@ -38,8 +38,7 @@ public class Analytical {
                     }
                 }
             } catch (PatternNginx.PatternNotMatch e) {
-                e.add("\nFile path: " + path);
-                throw new RuntimeException(e.get());
+                throw new RuntimeException(e.add("\nFile path: " + path));
             }
         }
         report();
@@ -64,21 +63,20 @@ public class Analytical {
                 current = nginx.getTime();
             }
         } catch (PatternNginx.PatternNotMatch e) {
-            e.add("\nLine: " + line
+            throw e.add("\nLine: " + line
                 + "\nLine's number: " + (countRequests + 1));
-            throw e;
         }
     }
 
     private void editRecords(PatternNginx nginx) {
         countRequests++;
-        var resource = nginx.getRequest();
+        var resource = nginx.getRequestResources();
         if (resources.containsKey(resource)) {
             resources.put(resource, resources.get(resource) + 1);
         } else {
             resources.put(resource, 1L);
         }
-        var code = nginx.getResponseCOde();
+        var code = nginx.getResponseCode();
         if (status.containsKey(code)) {
             status.put(code, status.get(code) + 1);
         } else {

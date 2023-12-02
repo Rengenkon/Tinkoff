@@ -10,8 +10,17 @@ public class PatternNginx {
     private static final int INNER_GROUPS_IP = 2;
     static final String TIME_PATTERN = ".*";
     private static final int INNER_GROUPS_TIME = 0;
-    static final String REQUEST_PATTERN = ".*";
-    private static final int INNER_GROUPS_REQUEST = 0;
+    static final String REQUEST_METHOD_PATTERN = "GET|POST|PUT|PATCH|DELETE|HEAD|CONNECT|OPTIONS|TRACE";
+    private static final int INNER_GROUPS_REQUEST_METHOD_PATTERN = 0;
+    static final String REQUEST_RESOURCES_PATTERN = ".*";
+    private static final int INNER_GROUPS_REQUEST_RESOURCES_PATTERN = 0;
+    static final String REQUEST_PROTOCOL_PATTERN = "HTTP/1.1";
+    private static final int INNER_GROUPS_REQUEST_PROTOCOL_PATTERN = 0;
+    static final String REQUEST_PATTERN =
+        "(" + REQUEST_METHOD_PATTERN + ") (" + REQUEST_RESOURCES_PATTERN +") (" + REQUEST_PROTOCOL_PATTERN + ")";
+    private static final int INNER_GROUPS_REQUEST = 3
+        + INNER_GROUPS_REQUEST_METHOD_PATTERN + INNER_GROUPS_REQUEST_RESOURCES_PATTERN
+        + INNER_GROUPS_REQUEST_PROTOCOL_PATTERN;
     static final String REFERER_PATTERN = ".*";
     private static final int INNER_GROUPS_REFERER = 0;
     static final String USER_AGENT_PATTERN = ".*";
@@ -30,6 +39,9 @@ public class PatternNginx {
     private static final int SECOND_IP = FIRST_IP + INNER_GROUPS_IP + 1;
     private static final int TIME = SECOND_IP + INNER_GROUPS_IP + 1;
     private static final int REQUEST = TIME + INNER_GROUPS_TIME + 1;
+    private static final int REQUEST_METHOD = REQUEST + 1;
+    private static final int REQUEST_RESOURCES = REQUEST_METHOD + INNER_GROUPS_REQUEST_METHOD_PATTERN + 1;
+    private static final int REQUEST_PROTOCOL = REQUEST_RESOURCES + INNER_GROUPS_REQUEST_METHOD_PATTERN + 1;
     private static final int RESPONSE_CODE = REQUEST + INNER_GROUPS_REQUEST + 1;
     private static final int SIZE = RESPONSE_CODE + 1;
     private static final int REFERER = SIZE + 1;
@@ -40,7 +52,7 @@ public class PatternNginx {
     private PatternNginx(Matcher matcher) throws PatternNotMatch {
         this.matcher = matcher;
         if (!this.matcher.find()) {
-            throw new PatternNotMatch().add("Parse error.");
+            throw new PatternNotMatch("Parse error.\n");
         }
     }
 
@@ -56,6 +68,10 @@ public class PatternNginx {
         return matcher.group(SECOND_IP);
     }
 
+    protected String getTimeS() {
+        return matcher.group(TIME);
+    }
+
     public OffsetDateTime getTime() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z");
         return OffsetDateTime.parse(matcher.group(TIME), formatter);
@@ -64,8 +80,17 @@ public class PatternNginx {
     public String getRequest() {
         return matcher.group(REQUEST);
     }
+    public String getRequestMethod() {
+        return matcher.group(REQUEST_METHOD);
+    }
+    public String getRequestResources() {
+        return matcher.group(REQUEST_RESOURCES);
+    }
+    public String getRequestProtocol() {
+        return matcher.group(REQUEST_PROTOCOL);
+    }
 
-    public String getResponseCOde() {
+    public String getResponseCode() {
         return matcher.group(RESPONSE_CODE);
     }
 
@@ -82,24 +107,12 @@ public class PatternNginx {
     }
 
     public static class PatternNotMatch extends Exception {
-        String mes;
-
-        public PatternNotMatch() {
-            super("Something went wrong when parsing the string");
-            mes = "";
-        }
-
         private PatternNotMatch(String message) {
             super(message);
         }
 
         public PatternNotMatch add(String s) {
-            mes += s;
-            return null;
-        }
-
-        public PatternNotMatch get() {
-            return new PatternNotMatch(mes);
+            return new PatternNotMatch(this.getMessage() + s);
         }
     }
 }
