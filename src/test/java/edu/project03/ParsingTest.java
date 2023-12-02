@@ -10,7 +10,6 @@ public class ParsingTest {
     };
     @Test
     void f() {
-//        Analitik.Groups;
-//        Analitik.PATTERN.matcher(myline)
+//        Settings settings = new Settings(myLine)
     }
 }

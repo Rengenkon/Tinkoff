@@ -14,6 +14,6 @@ public class AppTest {
             "--to", "2015-06-01",
             "--format", ""
         };
-        Analitik.main(args);
+        Analytical.main(args);
     }
 }

@@ -5,30 +5,23 @@ import java.util.ArrayList;
 public class Table {
     private final String handler;
     private final ArrayList<String[]> table = new ArrayList<>();
-    private int[] size;
+    private int[] size = null;
 
     Table(String name) {
         handler = name;
     }
 
     public void add(String... line) {
-        String[] mod = line;
-        for (int i = 0; i < mod.length; i++) {
-            if (mod[i] == null) {
-                mod[i] = "";
-            }
-        }
         if (size == null) {
-            size = new int[mod.length];
-        } else if (size.length != mod.length) {
+            size = new int[line.length];
+        } else if (size.length != line.length) {
             throw new RuntimeException("");
         }
-        table.add(mod);
-        for (int i = 0; i < mod.length; i++) {
-            size[i] = Math.max(size[i], mod[i].length());
+        table.add(line);
+        for (int i = 0; i < line.length; i++) {
+            size[i] = Math.max(size[i], line[i].length());
         }
     }
-
 
     public String getHandler() {
         return handler;

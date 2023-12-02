@@ -5,14 +5,24 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public abstract class Format {
+    String name;
+
+    public Format() {
+        name = "Report";
+    }
+
+    public Format(String fileName) {
+        name = fileName;
+    }
+
     public abstract String extension();
 
     public Path getFile() {
-        return Paths.get("Report" + extension());
+        return Paths.get(name + extension());
     }
 
     public Path getFile(Path folder) {
-        return Paths.get(folder.toString() +"Report" + extension());
+        return Paths.get(folder.toString() + name + extension());
     }
 
     public String[] getTable(Table table, Align align) {
@@ -43,12 +53,15 @@ public abstract class Format {
                 }
                 case Center -> {
                     builder.repeat(' ', (size - line[i].length()) / 2)
-                        .append(line[i]).
-                        repeat(' ', ((size - line[i].length()) / 2 + (size - line[i].length()) % 2));
+                        .append(line[i])
+                        .repeat(' ', ((size - line[i].length()) / 2 + (size - line[i].length()) % 2));
                 }
                 case Right -> {
                     builder.repeat(' ', size - line[i].length())
                         .append(line[i]);
+                }
+                default -> {
+
                 }
             }
         }
@@ -61,7 +74,7 @@ public abstract class Format {
         for (int size : sizes) {
             builder.append('+').repeat('-', size);
         }
-        if (!builder.isEmpty()){
+        if (!builder.isEmpty()) {
             builder.append("+\n");
         }
         return builder.toString();
