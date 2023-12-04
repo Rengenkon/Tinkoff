@@ -15,8 +15,11 @@ class Task02Test {
         //when
         task.execute(new Fib(1));
         task.execute(new Fib(10));
-        s.execute(new Fib(1));
-        s.execute(new Fib(10));
+        task.execute(new Fib(10));
+        task.execute(new Fib(10));
+        task.execute(new Fib(10));
+//        s.execute(new Fib(1));
+//        s.execute(new Fib(10));
         //then
         task.start();
     }

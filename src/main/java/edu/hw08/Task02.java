@@ -21,26 +21,25 @@ public class Task02 implements AutoCloseable {
     }
 
     public void start(){
-        int unraued = 0;
-        while (unraued != run.length) {
-            unraued = 0;
+        while (true) {
+            int unruned = 0;
             for (int i = 0; i < run.length; i++) {
                 if (run[i] == null) {
-                    if (nextRun < nextInsert || (rewrite && nextRun == nextInsert)){
+                    if (nextRun < nextInsert || (rewrite && nextRun >= nextInsert)){
                         run[i] = new Thread(queue[nextRun]);
                         nextRun = increment(nextRun);
+                        run[i].start();
                     } else {
-                        unraued++;
+                        unruned++;
                     }
                 } else if (!run[i].isAlive()) {
                     run[i] = null;
                     i--;
                 }
             }
-            for (Thread thread : run) {
-                if (thread != null && !thread.isAlive()) {
-                    thread.start();
-                }
+
+            if (unruned == run.length) {
+                break;
             }
         }
     }
@@ -71,9 +70,6 @@ public class Task02 implements AutoCloseable {
                         newQueue[i] = queue[i];
                     }
                     queue = newQueue;
-                } else {
-                    nextInsert = 0;
-                    rewrite = true;
                 }
             }else if (rewrite && nextInsert == nextRun){
                 rewrite = false;
